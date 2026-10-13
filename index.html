@@ -24,7 +24,6 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         body { transition: background-color 0.3s, color 0.3s; }
-        /* Smooth pop-up animation */
         .pop-animation { transition: all 0.3s ease-in-out; }
     </style>
 </head>
@@ -92,8 +91,8 @@
             <!-- Edit Action Bar -->
             <div class="w-full flex gap-2 p-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shrink-0 overflow-x-auto justify-center transition-colors shadow-sm">
                 <div class="w-full max-w-4xl flex gap-2">
-                    <button id="pasteBtn" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2">
-                        <i data-lucide="clipboard-paste" class="w-4 h-4"></i> Paste New
+                    <button id="addBtn" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Add / Paste New
                     </button>
                     <button id="copyBtn" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2">
                         <i data-lucide="copy" class="w-4 h-4"></i> Copy All
@@ -120,7 +119,25 @@
 
     <!-- ================= CUSTOM POP-UPS & MODALS ================= -->
     
-    <!-- 1. Custom Delete Confirmation Modal -->
+    <!-- 1. Add / Paste New Note Modal -->
+    <div id="addNoteModal" class="hidden-mode pop-animation fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex justify-center items-center p-4">
+        <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-lg w-full relative">
+            <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white w-full text-left">Add New Link or Text</h2>
+            
+            <textarea id="newNoteInput" class="w-full bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition text-gray-900 dark:text-gray-100 mb-6 resize-none" rows="4" placeholder="Type here or Long press to Paste..."></textarea>
+            
+            <div class="flex gap-3 w-full">
+                <button id="cancelAddBtn" class="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 py-3.5 rounded-xl font-semibold transition disabled:opacity-50">
+                    Cancel
+                </button>
+                <button id="saveAddBtn" class="flex-1 bg-primary hover:bg-blue-700 text-white py-3.5 rounded-xl font-semibold transition shadow-md flex justify-center items-center gap-2 disabled:opacity-80">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Save Note
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Custom Delete Confirmation Modal with Loader -->
     <div id="confirmModal" class="hidden-mode pop-animation fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex justify-center items-center p-4">
         <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full relative">
             <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex justify-center items-center text-red-600 dark:text-red-400 mb-4 shadow-inner">
@@ -129,17 +146,17 @@
             <h2 id="confirmTitle" class="text-2xl font-bold mb-2 text-gray-900 dark:text-white text-center">Are you sure?</h2>
             <p id="confirmMessage" class="text-sm text-gray-500 dark:text-gray-400 text-center mb-8 px-2">This action cannot be undone. It will be removed from all devices.</p>
             <div class="flex gap-3 w-full">
-                <button id="cancelConfirmBtn" class="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 py-3.5 rounded-xl font-semibold transition">
+                <button id="cancelConfirmBtn" class="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 py-3.5 rounded-xl font-semibold transition disabled:opacity-50">
                     Cancel
                 </button>
-                <button id="acceptConfirmBtn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-semibold transition shadow-md flex justify-center items-center gap-2">
+                <button id="acceptConfirmBtn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-semibold transition shadow-md flex justify-center items-center gap-2 disabled:opacity-80">
                     <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- 2. QR Code Modal -->
+    <!-- 3. QR Code Modal -->
     <div id="qrModal" class="hidden-mode pop-animation fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center p-4">
         <div class="bg-white dark:bg-gray-900 p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full relative">
             <button id="closeQrBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white transition bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded-full">
@@ -178,7 +195,9 @@
         const notesContainer = document.getElementById('notesContainer');
         const editNotesContainer = document.getElementById('editNotesContainer');
         const doneBtn = document.getElementById('doneBtn');
-        const pasteBtn = document.getElementById('pasteBtn');
+        
+        // Renamed Paste Button to Add Button
+        const addBtn = document.getElementById('addBtn');
         const copyBtn = document.getElementById('copyBtn');
         const clearBtn = document.getElementById('clearBtn');
         const quickInput = document.getElementById('quickInput');
@@ -193,7 +212,53 @@
         let latestText = "";
         let activeEditIndex = null;
 
-        // ================= CUSTOM CONFIRM MODAL LOGIC =================
+        // ================= CUSTOM ADD/PASTE NEW MODAL LOGIC =================
+        const addNoteModal = document.getElementById('addNoteModal');
+        const newNoteInput = document.getElementById('newNoteInput');
+        const cancelAddBtn = document.getElementById('cancelAddBtn');
+        const saveAddBtn = document.getElementById('saveAddBtn');
+
+        addBtn.addEventListener('click', () => {
+            addNoteModal.classList.remove('hidden-mode');
+            addNoteModal.classList.add('modal-active');
+            newNoteInput.value = ""; // Clear old text
+            setTimeout(() => newNoteInput.focus(), 100);
+        });
+
+        cancelAddBtn.addEventListener('click', () => {
+            addNoteModal.classList.remove('modal-active');
+            addNoteModal.classList.add('hidden-mode');
+        });
+
+        saveAddBtn.addEventListener('click', async () => {
+            const textToAdd = newNoteInput.value.trim();
+            if (textToAdd === "") return;
+
+            // Show Loader UI
+            const originalHtml = saveAddBtn.innerHTML;
+            saveAddBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Saving...`;
+            saveAddBtn.disabled = true;
+            cancelAddBtn.disabled = true;
+            lucide.createIcons();
+
+            // Append new text
+            const combinedText = latestText ? `${latestText}\n${textToAdd}` : textToAdd;
+            const success = await updateFirebaseText(combinedText);
+            
+            // Revert UI & Close Modal
+            saveAddBtn.innerHTML = originalHtml;
+            saveAddBtn.disabled = false;
+            cancelAddBtn.disabled = false;
+            lucide.createIcons();
+
+            if (success) {
+                addNoteModal.classList.remove('modal-active');
+                addNoteModal.classList.add('hidden-mode');
+            }
+        });
+        // ====================================================================
+
+        // ================= CUSTOM CONFIRM MODAL W/ LOADER =================
         const confirmModal = document.getElementById('confirmModal');
         const confirmTitle = document.getElementById('confirmTitle');
         const confirmMessage = document.getElementById('confirmMessage');
@@ -204,7 +269,7 @@
         window.showCustomConfirm = function(title, message, callback) {
             confirmTitle.innerText = title;
             confirmMessage.innerText = message;
-            confirmCallback = callback;
+            confirmCallback = callback; 
             
             confirmModal.classList.remove('hidden-mode');
             confirmModal.classList.add('modal-active');
@@ -217,8 +282,21 @@
             confirmCallback = null;
         });
 
-        acceptConfirmBtn.addEventListener('click', () => {
-            if(confirmCallback) confirmCallback();
+        acceptConfirmBtn.addEventListener('click', async () => {
+            if(confirmCallback) {
+                const originalHtml = acceptConfirmBtn.innerHTML;
+                acceptConfirmBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Processing...`;
+                acceptConfirmBtn.disabled = true;
+                cancelConfirmBtn.disabled = true;
+                lucide.createIcons();
+
+                await confirmCallback(); 
+
+                acceptConfirmBtn.innerHTML = originalHtml;
+                acceptConfirmBtn.disabled = false;
+                cancelConfirmBtn.disabled = false;
+            }
+            
             confirmModal.classList.remove('modal-active');
             confirmModal.classList.add('hidden-mode');
             confirmCallback = null;
@@ -339,7 +417,7 @@
             lucide.createIcons();
         }
 
-        // ================= INLINE EDIT LOGIC =================
+        // ================= INLINE EDIT W/ LOADER =================
         window.openInlineEdit = function(index) {
             activeEditIndex = index;
             const lines = latestText.split('\n').filter(line => line.trim() !== '');
@@ -351,8 +429,8 @@
             card.innerHTML = `
                 <textarea id="inline-input" class="w-full bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none resize-none text-lg leading-relaxed border-b border-gray-200 dark:border-gray-800 pb-3 mb-3" rows="3" placeholder="Edit your note..."></textarea>
                 <div class="flex justify-end gap-2">
-                    <button onclick="cancelInlineEdit()" class="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition flex items-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Cancel</button>
-                    <button onclick="saveInlineEdit(${index})" class="px-6 py-2.5 bg-primary hover:bg-blue-700 text-white font-semibold rounded-lg transition shadow-sm flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Save</button>
+                    <button id="cancel-inline-btn" onclick="cancelInlineEdit()" class="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition flex items-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Cancel</button>
+                    <button id="save-inline-btn" onclick="saveInlineEdit(${index})" class="px-6 py-2.5 bg-primary hover:bg-blue-700 text-white font-semibold rounded-lg transition shadow-sm flex items-center gap-2 disabled:opacity-80"><i data-lucide="check" class="w-4 h-4"></i> Save</button>
                 </div>
             `;
             
@@ -369,6 +447,15 @@
         }
 
         window.saveInlineEdit = async function(index) {
+            const saveBtn = document.getElementById('save-inline-btn');
+            const cancelBtn = document.getElementById('cancel-inline-btn');
+            const originalHtml = saveBtn.innerHTML;
+            
+            saveBtn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Saving...`;
+            saveBtn.disabled = true;
+            cancelBtn.disabled = true;
+            lucide.createIcons();
+
             const newVal = document.getElementById('inline-input').value.trim();
             let lines = latestText.split('\n').filter(line => line.trim() !== '');
             
@@ -379,6 +466,11 @@
             if (success) {
                 activeEditIndex = null;
                 renderEditModeText(); 
+            } else {
+                saveBtn.innerHTML = originalHtml;
+                saveBtn.disabled = false;
+                cancelBtn.disabled = false;
+                lucide.createIcons();
             }
         }
 
@@ -386,11 +478,9 @@
             showCustomConfirm("Delete this note?", "Are you sure you want to remove this specific note from all devices?", async () => {
                 let lines = latestText.split('\n').filter(line => line.trim() !== '');
                 lines.splice(index, 1);
-                const success = await updateFirebaseText(lines.join('\n'));
-                if(success) {
-                    activeEditIndex = null;
-                    renderEditModeText();
-                }
+                await updateFirebaseText(lines.join('\n'));
+                activeEditIndex = null;
+                renderEditModeText();
             });
         }
 
@@ -431,7 +521,7 @@
             statusDot.classList.replace('bg-emerald-500', 'bg-red-500');
         });
 
-        // ================= GLOBAL ACTIONS =================
+        // ================= GLOBAL ACTIONS W/ LOADERS =================
         quickSendBtn.addEventListener('click', async () => {
             const newText = quickInput.value.trim();
             if(!newText) return;
@@ -439,6 +529,7 @@
             
             const originalHTML = quickSendBtn.innerHTML;
             quickSendBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i>`;
+            quickSendBtn.disabled = true;
             lucide.createIcons();
             
             const success = await updateFirebaseText(combinedText);
@@ -446,13 +537,14 @@
             
             setTimeout(() => { 
                 quickSendBtn.innerHTML = originalHTML; 
+                quickSendBtn.disabled = false;
                 lucide.createIcons();
             }, 500);
         });
         quickInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') quickSendBtn.click(); });
 
         clearBtn.addEventListener('click', () => {
-            if(!latestText.trim()) return; // Don't show modal if already empty
+            if(!latestText.trim()) return; 
             
             showCustomConfirm("Clear All Notes?", "Do you want to delete ALL notes? This will instantly wipe them from your TV and phone.", async () => {
                 await updateFirebaseText("");
@@ -469,15 +561,6 @@
                 lucide.createIcons();
                 setTimeout(() => { copyBtn.innerHTML = original; lucide.createIcons(); }, 1500);
             } catch(e) { document.execCommand('copy'); }
-        });
-
-        pasteBtn.addEventListener('click', async () => {
-            try {
-                const text = await navigator.clipboard.readText();
-                if(text.trim() === "") return;
-                const newText = latestText ? `${latestText}\n${text}` : text;
-                await updateFirebaseText(newText);
-            } catch(e) { /* Fallback for browsers blocking clipboard */ }
         });
 
         // QR Modal Logic
