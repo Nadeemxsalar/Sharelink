@@ -17,19 +17,21 @@
         }
     </script>
     <style>
-        .hidden-mode { display: none !important; }
+        .hidden-mode { display: none !important; opacity: 0; pointer-events: none; }
+        .modal-active { display: flex !important; opacity: 1; pointer-events: auto; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         body { transition: background-color 0.3s, color 0.3s; }
+        /* Smooth pop-up animation */
+        .pop-animation { transition: all 0.3s ease-in-out; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 h-screen w-screen overflow-hidden flex flex-col font-sans">
 
     <!-- TOP NAVBAR -->
     <header class="w-full flex justify-between items-center px-4 py-3 md:px-8 md:py-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm z-20 shrink-0 transition-colors">
-        
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2 text-primary font-extrabold text-2xl md:text-3xl tracking-tight">
                 <i data-lucide="link-2" class="w-7 h-7 md:w-8 md:h-8"></i>
@@ -66,7 +68,6 @@
         
         <!-- ================= VIEW MODE (Home) ================= -->
         <div id="viewMode" class="w-full h-full flex flex-col absolute inset-0">
-            
             <div id="notesContainer" class="flex-1 overflow-y-auto p-4 md:p-8 md:px-20 lg:px-40 flex flex-col gap-3">
                 <div class="text-gray-400 text-center mt-20 flex flex-col items-center justify-center gap-4">
                     <i data-lucide="loader" class="w-8 h-8 animate-spin"></i>
@@ -88,7 +89,6 @@
 
         <!-- ================= EDIT MODE (Card Based) ================= -->
         <div id="editMode" class="hidden-mode w-full h-full flex flex-col absolute inset-0 bg-gray-50 dark:bg-gray-950 z-20 transition-colors">
-            
             <!-- Edit Action Bar -->
             <div class="w-full flex gap-2 p-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shrink-0 overflow-x-auto justify-center transition-colors shadow-sm">
                 <div class="w-full max-w-4xl flex gap-2">
@@ -118,15 +118,36 @@
         </div>
     </main>
 
-    <!-- QR Code Modal -->
-    <div id="qrModal" class="hidden-mode fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center p-4">
-        <div class="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm w-full relative">
-            <button id="closeQrBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white transition">
-                <i data-lucide="x" class="w-6 h-6"></i>
+    <!-- ================= CUSTOM POP-UPS & MODALS ================= -->
+    
+    <!-- 1. Custom Delete Confirmation Modal -->
+    <div id="confirmModal" class="hidden-mode pop-animation fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex justify-center items-center p-4">
+        <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full relative">
+            <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex justify-center items-center text-red-600 dark:text-red-400 mb-4 shadow-inner">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+            </div>
+            <h2 id="confirmTitle" class="text-2xl font-bold mb-2 text-gray-900 dark:text-white text-center">Are you sure?</h2>
+            <p id="confirmMessage" class="text-sm text-gray-500 dark:text-gray-400 text-center mb-8 px-2">This action cannot be undone. It will be removed from all devices.</p>
+            <div class="flex gap-3 w-full">
+                <button id="cancelConfirmBtn" class="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 py-3.5 rounded-xl font-semibold transition">
+                    Cancel
+                </button>
+                <button id="acceptConfirmBtn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-semibold transition shadow-md flex justify-center items-center gap-2">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. QR Code Modal -->
+    <div id="qrModal" class="hidden-mode pop-animation fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full relative">
+            <button id="closeQrBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white transition bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded-full">
+                <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <h2 class="text-xl font-bold mb-1 text-gray-900 dark:text-white text-center">Connect Device</h2>
+            <h2 class="text-xl font-bold mb-1 mt-2 text-gray-900 dark:text-white text-center">Connect Device</h2>
             <p class="text-sm text-gray-500 text-center mb-6">Scan to open ShareLink on your mobile.</p>
-            <div id="qrcode" class="p-4 bg-white rounded-xl shadow-sm border border-gray-200"></div>
+            <div id="qrcode" class="p-4 bg-white rounded-xl shadow-inner border border-gray-200"></div>
         </div>
     </div>
 
@@ -170,7 +191,39 @@
 
         let isEditMode = false;
         let latestText = "";
-        let activeEditIndex = null; // Tracks which card is currently open for editing
+        let activeEditIndex = null;
+
+        // ================= CUSTOM CONFIRM MODAL LOGIC =================
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+        const acceptConfirmBtn = document.getElementById('acceptConfirmBtn');
+        let confirmCallback = null;
+
+        window.showCustomConfirm = function(title, message, callback) {
+            confirmTitle.innerText = title;
+            confirmMessage.innerText = message;
+            confirmCallback = callback;
+            
+            confirmModal.classList.remove('hidden-mode');
+            confirmModal.classList.add('modal-active');
+            lucide.createIcons();
+        }
+
+        cancelConfirmBtn.addEventListener('click', () => {
+            confirmModal.classList.remove('modal-active');
+            confirmModal.classList.add('hidden-mode');
+            confirmCallback = null;
+        });
+
+        acceptConfirmBtn.addEventListener('click', () => {
+            if(confirmCallback) confirmCallback();
+            confirmModal.classList.remove('modal-active');
+            confirmModal.classList.add('hidden-mode');
+            confirmCallback = null;
+        });
+        // ==============================================================
 
         // Theme Logic
         themeToggleBtn.addEventListener('click', () => {
@@ -183,7 +236,7 @@
         // Toggle Modes
         toggleBtn.addEventListener('click', () => {
             isEditMode = !isEditMode;
-            activeEditIndex = null; // Reset edit state when switching modes
+            activeEditIndex = null;
             if (isEditMode) {
                 viewMode.classList.add('hidden-mode');
                 editMode.classList.remove('hidden-mode');
@@ -207,7 +260,7 @@
             return str.replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
         }
 
-        // ================= VIEW MODE RENDER (Box Click Logic) =================
+        // ================= VIEW MODE RENDER =================
         function renderViewModeText(text) {
             if (!text || text.trim() === "") {
                 notesContainer.innerHTML = `
@@ -227,9 +280,8 @@
             lines.forEach(line => {
                 let safeLine = escapeHTML(line);
                 const matches = line.match(urlRegex);
-                const firstUrl = matches ? matches[0] : null; // Get first link for box click
+                const firstUrl = matches ? matches[0] : null; 
                 
-                // Style link text without 'a' tag so box click handles it smoothly
                 let linkedLine = safeLine.replace(urlRegex, function(url) {
                     return `<span class="text-primary font-semibold underline underline-offset-2 break-all">${url}</span>`;
                 });
@@ -254,13 +306,14 @@
             notesContainer.scrollTop = notesContainer.scrollHeight;
         }
 
-        // ================= EDIT MODE RENDER (Card System) =================
+        // ================= EDIT MODE RENDER =================
         window.renderEditModeText = function() {
-            if (activeEditIndex !== null) return; // Prevent render if user is typing
+            if (activeEditIndex !== null) return; 
             
             const lines = latestText.split('\n').filter(line => line.trim() !== '');
             if (lines.length === 0) {
-                editNotesContainer.innerHTML = `<div class="text-center text-gray-400 mt-10">No notes to edit. Paste something!</div>`;
+                editNotesContainer.innerHTML = `<div class="text-center text-gray-400 mt-10 flex flex-col items-center"><i data-lucide="file-x" class="w-12 h-12 mb-3 opacity-30"></i> No notes to edit.</div>`;
+                lucide.createIcons();
                 return;
             }
 
@@ -286,15 +339,14 @@
             lucide.createIcons();
         }
 
-        // ================= INLINE EDIT LOGIC (Converts Card to Input) =================
+        // ================= INLINE EDIT LOGIC =================
         window.openInlineEdit = function(index) {
             activeEditIndex = index;
             const lines = latestText.split('\n').filter(line => line.trim() !== '');
             const card = document.getElementById(`edit-card-${index}`);
             
-            // Re-style card to Edit Mode UI
-            card.className = "w-full border-2 border-primary dark:border-primary bg-white dark:bg-gray-900 p-4 md:p-5 rounded-xl shadow-lg transition";
-            card.onclick = null; // Disable clicking again
+            card.className = "w-full border-2 border-primary dark:border-primary bg-white dark:bg-gray-900 p-4 md:p-5 rounded-xl shadow-lg transition pop-animation";
+            card.onclick = null; 
             
             card.innerHTML = `
                 <textarea id="inline-input" class="w-full bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none resize-none text-lg leading-relaxed border-b border-gray-200 dark:border-gray-800 pb-3 mb-3" rows="3" placeholder="Edit your note..."></textarea>
@@ -307,7 +359,7 @@
             const input = document.getElementById('inline-input');
             input.value = lines[index];
             input.focus();
-            input.setSelectionRange(input.value.length, input.value.length); // Cursor at end
+            input.setSelectionRange(input.value.length, input.value.length);
             lucide.createIcons();
         };
 
@@ -320,7 +372,7 @@
             const newVal = document.getElementById('inline-input').value.trim();
             let lines = latestText.split('\n').filter(line => line.trim() !== '');
             
-            if (newVal === "") { lines.splice(index, 1); } // Delete if empty
+            if (newVal === "") { lines.splice(index, 1); }
             else { lines[index] = newVal; }
             
             const success = await updateFirebaseText(lines.join('\n'));
@@ -330,15 +382,16 @@
             }
         }
 
-        window.deleteLine = async function(index) {
-            if(!confirm("Delete this specific note?")) return;
-            let lines = latestText.split('\n').filter(line => line.trim() !== '');
-            lines.splice(index, 1);
-            const success = await updateFirebaseText(lines.join('\n'));
-            if(success) {
-                activeEditIndex = null;
-                renderEditModeText();
-            }
+        window.deleteLine = function(index) {
+            showCustomConfirm("Delete this note?", "Are you sure you want to remove this specific note from all devices?", async () => {
+                let lines = latestText.split('\n').filter(line => line.trim() !== '');
+                lines.splice(index, 1);
+                const success = await updateFirebaseText(lines.join('\n'));
+                if(success) {
+                    activeEditIndex = null;
+                    renderEditModeText();
+                }
+            });
         }
 
         // ================= FIREBASE SYNC =================
@@ -347,7 +400,7 @@
                 await setDoc(noteDocRef, { text: newText, timestamp: new Date().getTime() });
                 return true;
             } catch (err) {
-                alert("Failed to save to database. Check connection.");
+                console.error("Firebase Error: ", err);
                 return false;
             }
         }
@@ -369,7 +422,6 @@
             }
             
             renderViewModeText(latestText);
-            // Only update edit mode UI if user is not currently typing in a box
             if (isEditMode && activeEditIndex === null) {
                 renderEditModeText();
             }
@@ -384,21 +436,38 @@
             const newText = quickInput.value.trim();
             if(!newText) return;
             const combinedText = latestText ? `${latestText}\n${newText}` : newText;
+            
+            const originalHTML = quickSendBtn.innerHTML;
+            quickSendBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i>`;
+            lucide.createIcons();
+            
             const success = await updateFirebaseText(combinedText);
             if(success) quickInput.value = "";
+            
+            setTimeout(() => { 
+                quickSendBtn.innerHTML = originalHTML; 
+                lucide.createIcons();
+            }, 500);
         });
         quickInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') quickSendBtn.click(); });
 
-        clearBtn.addEventListener('click', async () => {
-            if (confirm("Delete ALL notes?")) {
+        clearBtn.addEventListener('click', () => {
+            if(!latestText.trim()) return; // Don't show modal if already empty
+            
+            showCustomConfirm("Clear All Notes?", "Do you want to delete ALL notes? This will instantly wipe them from your TV and phone.", async () => {
                 await updateFirebaseText("");
-            }
+            });
         });
 
         copyBtn.addEventListener('click', async () => {
             try {
+                if(!latestText.trim()) return;
                 await navigator.clipboard.writeText(latestText);
-                alert("All notes copied!");
+                
+                const original = copyBtn.innerHTML;
+                copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Copied!`;
+                lucide.createIcons();
+                setTimeout(() => { copyBtn.innerHTML = original; lucide.createIcons(); }, 1500);
             } catch(e) { document.execCommand('copy'); }
         });
 
@@ -408,25 +477,31 @@
                 if(text.trim() === "") return;
                 const newText = latestText ? `${latestText}\n${text}` : text;
                 await updateFirebaseText(newText);
-            } catch(e) { alert("Browser prevented direct paste. Please use the Quick Add bar instead."); }
+            } catch(e) { /* Fallback for browsers blocking clipboard */ }
         });
 
-        // Modal Logic
+        // QR Modal Logic
         const qrBtn = document.getElementById('qrBtn');
         const qrModal = document.getElementById('qrModal');
         const closeQrBtn = document.getElementById('closeQrBtn');
         let qrGenerated = false;
+        
         qrBtn.addEventListener('click', () => {
             qrModal.classList.remove('hidden-mode');
+            qrModal.classList.add('modal-active');
             if(!qrGenerated) {
                 new QRCode(document.getElementById("qrcode"), { text: window.location.href, width: 180, height: 180 });
                 qrGenerated = true;
             }
         });
-        closeQrBtn.addEventListener('click', () => qrModal.classList.add('hidden-mode'));
+        closeQrBtn.addEventListener('click', () => {
+            qrModal.classList.remove('modal-active');
+            qrModal.classList.add('hidden-mode');
+        });
         
+        // Download logic
         document.getElementById('downloadBtn').addEventListener('click', () => {
-            if(!latestText) { alert("Nothing to download."); return; }
+            if(!latestText) return;
             const blob = new Blob([latestText], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
