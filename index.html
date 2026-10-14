@@ -6,11 +6,19 @@
     <meta name="theme-color" content="#f9fafb">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ShareLink">
+    <meta name="application-name" content="ShareLink">
     <title>ShareLink - Seamless Cross-Device Sync</title>
     
     <!-- SVG Favicon Added -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M9 17H7A5 5 0 0 1 7 7h2'/><path d='M15 7h2a5 5 0 1 1 0 10h-2'/><line x1='8' x2='16' y1='12' y2='12'/></svg>">
     
+    <!-- Apple Touch Icon (iOS Home Screen) -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='24' height='24' fill='%23ffffff'/><path d='M9 17H7A5 5 0 0 1 7 7h2'/><path d='M15 7h2a5 5 0 1 1 0 10h-2'/><line x1='8' x2='16' y1='12' y2='12'/></svg>">
+    
+    <!-- Web App Manifest (Android Home Screen / Quick Save) -->
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22ShareLink%22%2C%22short_name%22%3A%22ShareLink%22%2C%22display%22%3A%22standalone%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'%25232563eb'%20stroke-width%3D'2.5'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M9%2017H7A5%205%200%200%201%207%207h2'%2F%3E%3Cpath%20d%3D'M15%207h2a5%205%200%201%201%200%2010h-2'%2F%3E%3Cline%20x1%3D'8'%20x2%3D'16'%20y1%3D'12'%20y2%3D'12'%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%20512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Professional Icons -->
@@ -80,7 +88,7 @@
         <!-- ================= VIEW MODE (Home) ================= -->
         <div id="viewMode" class="w-full h-full flex flex-col absolute inset-0">
             <!-- Container max-width fixed for clean layout -->
-            <div id="notesContainer" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-4 w-full max-w-4xl mx-auto">
+            <div id="notesContainer" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-3 md:gap-4 w-full max-w-4xl mx-auto">
                 <div class="text-gray-400 text-center mt-20 flex flex-col items-center justify-center gap-4">
                     <i data-lucide="loader" class="w-8 h-8 animate-spin"></i>
                     <p>Loading your data...</p>
@@ -117,7 +125,7 @@
             </div>
 
             <!-- Edit Cards Container -->
-            <div id="editNotesContainer" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-4 w-full max-w-4xl mx-auto">
+            <div id="editNotesContainer" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-3 md:gap-4 w-full max-w-4xl mx-auto">
                 <!-- Cards render here via JavaScript -->
             </div>
             
@@ -137,7 +145,6 @@
         <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-lg w-full relative">
             <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white w-full text-left">Add New Link or Text</h2>
             
-            <!-- Text area adjusted for multiple lines visually -->
             <textarea id="newNoteInput" class="w-full bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition text-gray-900 dark:text-gray-100 mb-6 resize-none whitespace-pre-wrap" rows="5" placeholder="Type or Paste Code here..."></textarea>
             
             <div class="flex gap-3 w-full">
@@ -151,7 +158,7 @@
         </div>
     </div>
 
-    <!-- 2. Custom Delete Confirmation Modal with Loader -->
+    <!-- 2. Custom Delete Confirmation Modal -->
     <div id="confirmModal" class="hidden-mode pop-animation fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex justify-center items-center p-4">
         <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full relative">
             <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex justify-center items-center text-red-600 dark:text-red-400 mb-4 shadow-inner">
@@ -245,7 +252,6 @@
         });
 
         saveAddBtn.addEventListener('click', async () => {
-            // FIX: Replace Newline to Keep Big Code in ONE Box safely
             const textToAdd = newNoteInput.value.trim().replace(/\r?\n/g, ' ↵ ');
             if (textToAdd === "") return;
 
@@ -344,17 +350,16 @@
         
         doneBtn.addEventListener('click', () => toggleBtn.click());
 
-        // FIX: Secure HTML Escaping Function
+        // Secure HTML Escaping Function
         function escapeHTML(str) {
             return str.replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
         }
 
-        // MAJOR FIX: Extract string via Index securely so quotes don't break HTML layout
+        // Extract string via Index securely so quotes don't break HTML layout
         window.copySingleNote = function(index) {
             try {
                 const lines = latestText.split('\n').filter(line => line.trim() !== '');
                 if(lines[index]) {
-                    // Wapas newlines daalo clipboard pe bhejne se pehle
                     const textToCopy = lines[index].replace(/ ↵ /g, '\n');
                     navigator.clipboard.writeText(textToCopy);
                 }
@@ -391,13 +396,10 @@
             
             let htmlContent = "";
             lines.forEach((rawLine, index) => {
-                // Restore newlines properly so it looks formatted on screen
                 const displayLine = rawLine.replace(/ ↵ /g, '\n');
                 
-                // Pure line ko safe banao
                 let safeLine = escapeHTML(displayLine);
                 
-                // Securely extract and replace URLs
                 const rawUrls = displayLine.match(urlRegex) || [];
                 const firstUrl = rawUrls.length > 0 ? rawUrls[0] : null; 
                 
@@ -408,24 +410,19 @@
                 });
 
                 const iconName = firstUrl ? 'link' : 'align-left';
-                
-                // FIX: No string interpolation in onclick, use Index instead
                 const clickAttr = firstUrl ? `onclick="window.openSafeUrl(${index}, event)"` : '';
                 
-                // UI Fix: Box style layout with line-clamp-3
+                // UI Fix: items-center applied here for perfect middle alignment
                 htmlContent += `
-                    <div ${clickAttr} class="group w-full border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-4 md:p-5 rounded-xl text-gray-800 dark:text-gray-200 flex justify-between items-start gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden relative">
-                        <div class="text-gray-400 group-hover:text-primary transition-colors shrink-0 mt-1">
-                            <i data-lucide="${iconName}" class="w-6 h-6"></i>
+                    <div ${clickAttr} class="group w-full border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden relative">
+                        <div class="text-gray-400 group-hover:text-primary transition-colors shrink-0 flex items-center justify-center">
+                            <i data-lucide="${iconName}" class="w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <!-- whitespace-pre-wrap ensures restored newlines actually break visually -->
+                        <div class="flex-1 min-w-0 flex items-center">
                             <div class="whitespace-pre-wrap break-words leading-relaxed text-base md:text-lg line-clamp-3">${safeLine}</div>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="flex items-center gap-1 shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                             ${firstUrl ? `<div class="text-primary p-2"><i data-lucide="external-link" class="w-5 h-5"></i></div>` : ''}
-                            
-                            <!-- BUG FIXED: Only passing ${index} instead of raw string -->
                             <button onclick="event.stopPropagation(); window.copySingleNote(${index})" class="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Copy">
                                 <i data-lucide="copy" class="w-5 h-5"></i>
                             </button>
@@ -452,16 +449,16 @@
 
             let htmlContent = "";
             lines.forEach((rawLine, index) => {
-                // Restore newlines visually
                 const displayLine = rawLine.replace(/ ↵ /g, '\n');
                 let safeLine = escapeHTML(displayLine);
                 
+                // UI Fix: items-center applied here for perfect middle alignment
                 htmlContent += `
-                    <div id="edit-card-${index}" onclick="openInlineEdit(${index})" class="group w-full border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-4 md:p-5 rounded-xl text-gray-800 dark:text-gray-200 flex justify-between items-start gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden">
-                        <div class="flex-1 min-w-0">
-                            <div class="whitespace-pre-wrap break-words leading-relaxed text-base line-clamp-3">${safeLine}</div>
+                    <div id="edit-card-${index}" onclick="openInlineEdit(${index})" class="group w-full border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center justify-between gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden">
+                        <div class="flex-1 min-w-0 flex items-center">
+                            <div class="whitespace-pre-wrap break-words leading-relaxed text-base md:text-lg line-clamp-3">${safeLine}</div>
                         </div>
-                        <div class="flex gap-2 text-gray-400 shrink-0 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="flex items-center gap-1 shrink-0 md:opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onclick="event.stopPropagation(); window.deleteLine(${index})" class="p-2 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition" title="Delete Note">
                                 <i data-lucide="trash-2" class="w-5 h-5"></i>
                             </button>
@@ -486,7 +483,6 @@
             card.className = "w-full border-2 border-primary dark:border-primary bg-white dark:bg-gray-900 p-4 md:p-5 rounded-xl shadow-lg transition pop-animation";
             card.onclick = null; 
             
-            // Revert placeholder character back to real newline for editing
             const editableText = lines[index].replace(/ ↵ /g, '\n');
 
             card.innerHTML = `
@@ -519,7 +515,6 @@
             cancelBtn.disabled = true;
             lucide.createIcons();
 
-            // Convert newlines back to placeholder so it stays in one box on Firebase
             const newVal = document.getElementById('inline-input').value.trim().replace(/\r?\n/g, ' ↵ ');
             let lines = latestText.split('\n').filter(line => line.trim() !== '');
             
@@ -587,7 +582,6 @@
 
         // ================= GLOBAL ACTIONS W/ LOADERS =================
         quickSendBtn.addEventListener('click', async () => {
-            // Convert newline to placeholder so it stays in one box
             const newText = quickInput.value.trim().replace(/\r?\n/g, ' ↵ ');
             if(!newText) return;
             const combinedText = latestText ? `${latestText}\n${newText}` : newText;
@@ -619,7 +613,6 @@
         copyBtn.addEventListener('click', async () => {
             try {
                 if(!latestText.trim()) return;
-                // Revert placeholder character back to real newline for copying
                 const trueText = latestText.replace(/ ↵ /g, '\n');
                 await navigator.clipboard.writeText(trueText);
                 
@@ -656,7 +649,7 @@
             const blob = new Blob([trueText], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = `ShareLink_Backup_${new Date().toLocaleDateString()}.txt`; a.click();
+            a.href = url; a.download = `ShareLink.txt`; a.click();
             URL.revokeObjectURL(url);
         });
 
