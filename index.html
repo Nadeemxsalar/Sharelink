@@ -7,6 +7,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>ShareLink - Seamless Cross-Device Sync</title>
+    
+    <!-- SVG Favicon Added -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M9 17H7A5 5 0 0 1 7 7h2'/><path d='M15 7h2a5 5 0 1 1 0 10h-2'/><line x1='8' x2='16' y1='12' y2='12'/></svg>">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Professional Icons -->
@@ -36,7 +40,12 @@
     <header class="w-full flex justify-between items-center px-4 py-3 md:px-8 md:py-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm z-20 shrink-0 transition-colors">
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2 text-primary font-extrabold text-2xl md:text-3xl tracking-tight">
-                <i data-lucide="link-2" class="w-7 h-7 md:w-8 md:h-8"></i>
+                <!-- Inline SVG Logo (Same as Favicon) -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7 md:w-8 md:h-8">
+                    <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
+                    <path d="M15 7h2a5 5 0 1 1 0 10h-2"/>
+                    <line x1="8" x2="16" y1="12" y2="12"/>
+                </svg>
                 <span>Share<span class="text-gray-900 dark:text-white">Link</span></span>
             </div>
             <div class="hidden md:flex items-center gap-2 border-l border-gray-300 dark:border-gray-700 pl-4 ml-2">
@@ -142,14 +151,14 @@
         </div>
     </div>
 
-    <!-- 2. Custom Delete Confirmation Modal -->
+    <!-- 2. Custom Delete Confirmation Modal with Loader -->
     <div id="confirmModal" class="hidden-mode pop-animation fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex justify-center items-center p-4">
         <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full relative">
             <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex justify-center items-center text-red-600 dark:text-red-400 mb-4 shadow-inner">
                 <i data-lucide="alert-triangle" class="w-8 h-8"></i>
             </div>
             <h2 id="confirmTitle" class="text-2xl font-bold mb-2 text-gray-900 dark:text-white text-center">Are you sure?</h2>
-            <p id="confirmMessage" class="text-sm text-gray-500 dark:text-gray-400 text-center mb-8 px-2">This action cannot be undone.</p>
+            <p id="confirmMessage" class="text-sm text-gray-500 dark:text-gray-400 text-center mb-8 px-2">This action cannot be undone. It will be removed from all devices.</p>
             <div class="flex gap-3 w-full">
                 <button id="cancelConfirmBtn" class="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 py-3.5 rounded-xl font-semibold transition disabled:opacity-50">
                     Cancel
