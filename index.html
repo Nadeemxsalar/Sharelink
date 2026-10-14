@@ -261,7 +261,8 @@
             cancelAddBtn.disabled = true;
             lucide.createIcons();
 
-            const combinedText = latestText ? `${latestText}\n${textToAdd}` : textToAdd;
+            // FIXED: Naya data aage add kiya (Prepend) taaki wo sabse top par aaye
+            const combinedText = latestText ? `${textToAdd}\n${latestText}` : textToAdd;
             const success = await updateFirebaseText(combinedText);
             
             saveAddBtn.innerHTML = originalHtml;
@@ -412,9 +413,9 @@
                 const iconName = firstUrl ? 'link' : 'align-left';
                 const clickAttr = firstUrl ? `onclick="window.openSafeUrl(${index}, event)"` : '';
                 
-                // UI Fix: items-center applied here for perfect middle alignment
+                // UI FIX: Added shrink-0 to prevent box from getting smaller when list overflows
                 htmlContent += `
-                    <div ${clickAttr} class="group w-full border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden relative">
+                    <div ${clickAttr} class="group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden relative">
                         <div class="text-gray-400 group-hover:text-primary transition-colors shrink-0 flex items-center justify-center">
                             <i data-lucide="${iconName}" class="w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
@@ -433,7 +434,9 @@
             
             notesContainer.innerHTML = htmlContent;
             lucide.createIcons();
-            notesContainer.scrollTop = notesContainer.scrollHeight;
+            
+            // Auto-scroll to top so latest new data is always visible immediately
+            notesContainer.scrollTop = 0;
         }
 
         // ================= EDIT MODE RENDER =================
@@ -452,9 +455,9 @@
                 const displayLine = rawLine.replace(/ ↵ /g, '\n');
                 let safeLine = escapeHTML(displayLine);
                 
-                // UI Fix: items-center applied here for perfect middle alignment
+                // UI FIX: Added shrink-0 to prevent box from getting smaller when list overflows
                 htmlContent += `
-                    <div id="edit-card-${index}" onclick="openInlineEdit(${index})" class="group w-full border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center justify-between gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden">
+                    <div id="edit-card-${index}" onclick="openInlineEdit(${index})" class="group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center justify-between gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden">
                         <div class="flex-1 min-w-0 flex items-center">
                             <div class="whitespace-pre-wrap break-words leading-relaxed text-base md:text-lg line-clamp-3">${safeLine}</div>
                         </div>
@@ -480,7 +483,8 @@
             const lines = latestText.split('\n').filter(line => line.trim() !== '');
             const card = document.getElementById(`edit-card-${index}`);
             
-            card.className = "w-full border-2 border-primary dark:border-primary bg-white dark:bg-gray-900 p-4 md:p-5 rounded-xl shadow-lg transition pop-animation";
+            // Added shrink-0 here as well to prevent the edit box from shrinking
+            card.className = "w-full shrink-0 border-2 border-primary dark:border-primary bg-white dark:bg-gray-900 p-4 md:p-5 rounded-xl shadow-lg transition pop-animation";
             card.onclick = null; 
             
             const editableText = lines[index].replace(/ ↵ /g, '\n');
@@ -584,7 +588,9 @@
         quickSendBtn.addEventListener('click', async () => {
             const newText = quickInput.value.trim().replace(/\r?\n/g, ' ↵ ');
             if(!newText) return;
-            const combinedText = latestText ? `${latestText}\n${newText}` : newText;
+            
+            // FIXED: Naya data aage add kiya (Prepend) taaki wo sabse top par aaye
+            const combinedText = latestText ? `${newText}\n${latestText}` : newText;
             
             const originalHTML = quickSendBtn.innerHTML;
             quickSendBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i>`;
