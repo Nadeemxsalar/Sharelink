@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#f9fafb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>ShareLink - Seamless Cross-Device Sync</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,11 +26,11 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
-        body { transition: background-color 0.3s, color 0.3s; }
+        body { transition: background-color 0.3s, color 0.3s; overscroll-behavior-y: none; }
         .pop-animation { transition: all 0.3s ease-in-out; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 h-screen w-screen overflow-hidden flex flex-col font-sans">
+<body class="bg-gray-50 text-gray-900 h-[100dvh] w-screen overflow-hidden flex flex-col font-sans">
 
     <!-- TOP NAVBAR -->
     <header class="w-full flex justify-between items-center px-4 py-3 md:px-8 md:py-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm z-20 shrink-0 transition-colors">
@@ -55,9 +58,9 @@
                 <i data-lucide="qr-code" class="w-5 h-5"></i>
             </button>
             
-            <button id="toggleBtn" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm md:text-base font-medium transition flex items-center gap-2 ml-1 md:ml-2 shadow-sm">
+            <button id="toggleBtn" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm md:text-base font-medium transition flex items-center gap-2 ml-1 md:ml-2 shadow-sm shrink-0">
                 <i data-lucide="file-edit" class="w-4 h-4"></i>
-                <span>Full Edit</span>
+                <span class="hidden md:inline">Full Edit</span>
             </button>
         </div>
     </header>
@@ -67,7 +70,8 @@
         
         <!-- ================= VIEW MODE (Home) ================= -->
         <div id="viewMode" class="w-full h-full flex flex-col absolute inset-0">
-            <div id="notesContainer" class="flex-1 overflow-y-auto p-4 md:p-8 md:px-20 lg:px-40 flex flex-col gap-3">
+            <!-- Container max-width fixed for clean layout -->
+            <div id="notesContainer" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-4 w-full max-w-4xl mx-auto">
                 <div class="text-gray-400 text-center mt-20 flex flex-col items-center justify-center gap-4">
                     <i data-lucide="loader" class="w-8 h-8 animate-spin"></i>
                     <p>Loading your data...</p>
@@ -75,11 +79,11 @@
             </div>
 
             <!-- Quick Add Bar -->
-            <div class="w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-3 md:p-4 shrink-0 flex justify-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 transition-colors">
+            <div class="w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-3 md:p-4 shrink-0 flex justify-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 transition-colors pb-safe">
                 <div class="w-full max-w-4xl flex gap-2">
-                    <input type="text" id="quickInput" class="flex-1 bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-5 py-3.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition" placeholder="Paste link or type note here...">
-                    <button id="quickSendBtn" class="bg-primary hover:bg-blue-700 text-white px-6 md:px-8 py-3.5 rounded-xl font-semibold transition shadow-sm flex items-center gap-2">
-                        <span>Send</span>
+                    <input type="text" id="quickInput" class="flex-1 min-w-0 bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-4 md:px-5 py-3 md:py-3.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition" placeholder="Paste link or type note here...">
+                    <button id="quickSendBtn" class="shrink-0 bg-primary hover:bg-blue-700 text-white px-4 md:px-8 py-3 md:py-3.5 rounded-xl font-semibold transition shadow-sm flex items-center gap-2">
+                        <span class="hidden md:inline">Send</span>
                         <i data-lucide="send" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -89,15 +93,15 @@
         <!-- ================= EDIT MODE (Card Based) ================= -->
         <div id="editMode" class="hidden-mode w-full h-full flex flex-col absolute inset-0 bg-gray-50 dark:bg-gray-950 z-20 transition-colors">
             <!-- Edit Action Bar -->
-            <div class="w-full flex gap-2 p-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shrink-0 overflow-x-auto justify-center transition-colors shadow-sm">
+            <div class="w-full flex gap-2 p-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shrink-0 overflow-x-auto justify-start md:justify-center transition-colors shadow-sm">
                 <div class="w-full max-w-4xl flex gap-2">
-                    <button id="addBtn" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2">
-                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Add / Paste New
+                    <button id="addBtn" class="shrink-0 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Add New
                     </button>
-                    <button id="copyBtn" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2">
+                    <button id="copyBtn" class="shrink-0 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2">
                         <i data-lucide="copy" class="w-4 h-4"></i> Copy All
                     </button>
-                    <button id="clearBtn" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-900/40 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2 ml-auto">
+                    <button id="clearBtn" class="shrink-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-900/40 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2 ml-auto">
                         <i data-lucide="trash-2" class="w-4 h-4"></i> Clear All
                     </button>
                 </div>
@@ -109,7 +113,7 @@
             </div>
             
             <!-- Done Editing Button -->
-            <div class="p-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shrink-0 flex justify-center transition-colors">
+            <div class="p-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shrink-0 flex justify-center transition-colors pb-safe">
                 <button id="doneBtn" class="w-full max-w-4xl bg-primary hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-lg md:text-xl transition shadow-md flex justify-center items-center gap-2">
                     <i data-lucide="check-circle" class="w-5 h-5"></i> Done Editing
                 </button>
@@ -124,7 +128,8 @@
         <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-lg w-full relative">
             <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white w-full text-left">Add New Link or Text</h2>
             
-            <textarea id="newNoteInput" class="w-full bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition text-gray-900 dark:text-gray-100 mb-6 resize-none" rows="4" placeholder="Type here or Long press to Paste..."></textarea>
+            <!-- Text area adjusted for multiple lines visually -->
+            <textarea id="newNoteInput" class="w-full bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition text-gray-900 dark:text-gray-100 mb-6 resize-none whitespace-pre-wrap" rows="5" placeholder="Type or Paste Code here..."></textarea>
             
             <div class="flex gap-3 w-full">
                 <button id="cancelAddBtn" class="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 py-3.5 rounded-xl font-semibold transition disabled:opacity-50">
@@ -137,14 +142,14 @@
         </div>
     </div>
 
-    <!-- 2. Custom Delete Confirmation Modal with Loader -->
+    <!-- 2. Custom Delete Confirmation Modal -->
     <div id="confirmModal" class="hidden-mode pop-animation fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex justify-center items-center p-4">
         <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full relative">
             <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex justify-center items-center text-red-600 dark:text-red-400 mb-4 shadow-inner">
                 <i data-lucide="alert-triangle" class="w-8 h-8"></i>
             </div>
             <h2 id="confirmTitle" class="text-2xl font-bold mb-2 text-gray-900 dark:text-white text-center">Are you sure?</h2>
-            <p id="confirmMessage" class="text-sm text-gray-500 dark:text-gray-400 text-center mb-8 px-2">This action cannot be undone. It will be removed from all devices.</p>
+            <p id="confirmMessage" class="text-sm text-gray-500 dark:text-gray-400 text-center mb-8 px-2">This action cannot be undone.</p>
             <div class="flex gap-3 w-full">
                 <button id="cancelConfirmBtn" class="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 py-3.5 rounded-xl font-semibold transition disabled:opacity-50">
                     Cancel
@@ -175,6 +180,7 @@
 
         lucide.createIcons();
 
+        // Aapki Original Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAU65jQ-1m4G_QgWCkn-9uue0xVY1Iz4Cc",
             authDomain: "sharelink-a2b25.firebaseapp.com",
@@ -196,7 +202,6 @@
         const editNotesContainer = document.getElementById('editNotesContainer');
         const doneBtn = document.getElementById('doneBtn');
         
-        // Renamed Paste Button to Add Button
         const addBtn = document.getElementById('addBtn');
         const copyBtn = document.getElementById('copyBtn');
         const clearBtn = document.getElementById('clearBtn');
@@ -221,7 +226,7 @@
         addBtn.addEventListener('click', () => {
             addNoteModal.classList.remove('hidden-mode');
             addNoteModal.classList.add('modal-active');
-            newNoteInput.value = ""; // Clear old text
+            newNoteInput.value = ""; 
             setTimeout(() => newNoteInput.focus(), 100);
         });
 
@@ -231,21 +236,19 @@
         });
 
         saveAddBtn.addEventListener('click', async () => {
-            const textToAdd = newNoteInput.value.trim();
+            // FIX: Replace Newline to Keep Big Code in ONE Box safely
+            const textToAdd = newNoteInput.value.trim().replace(/\r?\n/g, ' ↵ ');
             if (textToAdd === "") return;
 
-            // Show Loader UI
             const originalHtml = saveAddBtn.innerHTML;
             saveAddBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Saving...`;
             saveAddBtn.disabled = true;
             cancelAddBtn.disabled = true;
             lucide.createIcons();
 
-            // Append new text
             const combinedText = latestText ? `${latestText}\n${textToAdd}` : textToAdd;
             const success = await updateFirebaseText(combinedText);
             
-            // Revert UI & Close Modal
             saveAddBtn.innerHTML = originalHtml;
             saveAddBtn.disabled = false;
             cancelAddBtn.disabled = false;
@@ -256,7 +259,6 @@
                 addNoteModal.classList.add('hidden-mode');
             }
         });
-        // ====================================================================
 
         // ================= CUSTOM CONFIRM MODAL W/ LOADER =================
         const confirmModal = document.getElementById('confirmModal');
@@ -301,7 +303,6 @@
             confirmModal.classList.add('hidden-mode');
             confirmCallback = null;
         });
-        // ==============================================================
 
         // Theme Logic
         themeToggleBtn.addEventListener('click', () => {
@@ -318,14 +319,14 @@
             if (isEditMode) {
                 viewMode.classList.add('hidden-mode');
                 editMode.classList.remove('hidden-mode');
-                toggleBtn.innerHTML = `<i data-lucide="eye" class="w-4 h-4"></i> <span>View Notes</span>`;
+                toggleBtn.innerHTML = `<i data-lucide="eye" class="w-4 h-4"></i> <span class="hidden md:inline">View Notes</span>`;
                 toggleBtn.classList.replace('bg-primary', 'bg-gray-800');
                 toggleBtn.classList.replace('hover:bg-blue-700', 'hover:bg-gray-900');
                 renderEditModeText();
             } else {
                 editMode.classList.add('hidden-mode');
                 viewMode.classList.remove('hidden-mode');
-                toggleBtn.innerHTML = `<i data-lucide="file-edit" class="w-4 h-4"></i> <span>Full Edit</span>`;
+                toggleBtn.innerHTML = `<i data-lucide="file-edit" class="w-4 h-4"></i> <span class="hidden md:inline">Full Edit</span>`;
                 toggleBtn.classList.replace('bg-gray-800', 'bg-primary');
                 toggleBtn.classList.replace('hover:bg-gray-900', 'hover:bg-blue-700');
             }
@@ -334,8 +335,33 @@
         
         doneBtn.addEventListener('click', () => toggleBtn.click());
 
+        // FIX: Secure HTML Escaping Function
         function escapeHTML(str) {
             return str.replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
+        }
+
+        // MAJOR FIX: Extract string via Index securely so quotes don't break HTML layout
+        window.copySingleNote = function(index) {
+            try {
+                const lines = latestText.split('\n').filter(line => line.trim() !== '');
+                if(lines[index]) {
+                    // Wapas newlines daalo clipboard pe bhejne se pehle
+                    const textToCopy = lines[index].replace(/ ↵ /g, '\n');
+                    navigator.clipboard.writeText(textToCopy);
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        window.openSafeUrl = function(index, event) {
+            if(event) event.stopPropagation(); // Stop parent click
+            const lines = latestText.split('\n').filter(line => line.trim() !== '');
+            if(lines[index]) {
+                const urlRegex = /(https?:\/\/[^\s<"']+)/g;
+                const matches = lines[index].match(urlRegex);
+                if (matches && matches.length > 0) {
+                    window.open(matches[0], '_blank');
+                }
+            }
         }
 
         // ================= VIEW MODE RENDER =================
@@ -351,30 +377,50 @@
                 return;
             }
 
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const urlRegex = /(https?:\/\/[^\s<"']+)/g;
             const lines = text.split('\n').filter(line => line.trim() !== '');
             
             let htmlContent = "";
-            lines.forEach(line => {
-                let safeLine = escapeHTML(line);
-                const matches = line.match(urlRegex);
-                const firstUrl = matches ? matches[0] : null; 
+            lines.forEach((rawLine, index) => {
+                // Restore newlines properly so it looks formatted on screen
+                const displayLine = rawLine.replace(/ ↵ /g, '\n');
                 
-                let linkedLine = safeLine.replace(urlRegex, function(url) {
-                    return `<span class="text-primary font-semibold underline underline-offset-2 break-all">${url}</span>`;
+                // Pure line ko safe banao
+                let safeLine = escapeHTML(displayLine);
+                
+                // Securely extract and replace URLs
+                const rawUrls = displayLine.match(urlRegex) || [];
+                const firstUrl = rawUrls.length > 0 ? rawUrls[0] : null; 
+                
+                const uniqueUrls = [...new Set(rawUrls)];
+                uniqueUrls.forEach(url => {
+                    const escapedUrl = escapeHTML(url);
+                    safeLine = safeLine.split(escapedUrl).join(`<span class="text-primary font-semibold underline underline-offset-2">${escapedUrl}</span>`);
                 });
 
                 const iconName = firstUrl ? 'link' : 'align-left';
-                const clickAttr = firstUrl ? `onclick="window.open('${firstUrl}', '_blank')"` : '';
-                const cursorClass = firstUrl ? 'cursor-pointer hover:bg-white dark:hover:bg-gray-800 hover:shadow-md border-transparent hover:border-blue-200 dark:hover:border-blue-900/50' : 'hover:bg-white dark:hover:bg-gray-800/50 border-transparent';
                 
+                // FIX: No string interpolation in onclick, use Index instead
+                const clickAttr = firstUrl ? `onclick="window.openSafeUrl(${index}, event)"` : '';
+                
+                // UI Fix: Box style layout with line-clamp-3
                 htmlContent += `
-                    <div ${clickAttr} class="group w-full border border-gray-200 border-b-gray-300 dark:border-gray-800 py-4 px-4 text-gray-800 dark:text-gray-200 text-lg md:text-xl flex items-start gap-4 rounded-xl transition-all ${cursorClass}">
-                        <div class="mt-1 text-gray-400 group-hover:text-primary transition-colors shrink-0">
+                    <div ${clickAttr} class="group w-full border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-4 md:p-5 rounded-xl text-gray-800 dark:text-gray-200 flex justify-between items-start gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden relative">
+                        <div class="text-gray-400 group-hover:text-primary transition-colors shrink-0 mt-1">
                             <i data-lucide="${iconName}" class="w-6 h-6"></i>
                         </div>
-                        <div class="w-full whitespace-pre-wrap leading-relaxed">${linkedLine}</div>
-                        ${firstUrl ? `<div class="opacity-0 group-hover:opacity-100 transition-opacity text-primary shrink-0 mt-1"><i data-lucide="external-link" class="w-5 h-5"></i></div>` : ''}
+                        <div class="flex-1 min-w-0">
+                            <!-- whitespace-pre-wrap ensures restored newlines actually break visually -->
+                            <div class="whitespace-pre-wrap break-words leading-relaxed text-base md:text-lg line-clamp-3">${safeLine}</div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                            ${firstUrl ? `<div class="text-primary p-2"><i data-lucide="external-link" class="w-5 h-5"></i></div>` : ''}
+                            
+                            <!-- BUG FIXED: Only passing ${index} instead of raw string -->
+                            <button onclick="event.stopPropagation(); window.copySingleNote(${index})" class="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Copy">
+                                <i data-lucide="copy" class="w-5 h-5"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
             });
@@ -396,13 +442,18 @@
             }
 
             let htmlContent = "";
-            lines.forEach((line, index) => {
-                let safeLine = escapeHTML(line);
+            lines.forEach((rawLine, index) => {
+                // Restore newlines visually
+                const displayLine = rawLine.replace(/ ↵ /g, '\n');
+                let safeLine = escapeHTML(displayLine);
+                
                 htmlContent += `
-                    <div id="edit-card-${index}" onclick="openInlineEdit(${index})" class="group w-full border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-4 md:p-5 rounded-xl text-gray-800 dark:text-gray-200 flex justify-between items-start gap-4 shadow-sm transition hover:shadow-md cursor-pointer">
-                        <div class="whitespace-pre-wrap leading-relaxed flex-1">${safeLine}</div>
+                    <div id="edit-card-${index}" onclick="openInlineEdit(${index})" class="group w-full border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-4 md:p-5 rounded-xl text-gray-800 dark:text-gray-200 flex justify-between items-start gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden">
+                        <div class="flex-1 min-w-0">
+                            <div class="whitespace-pre-wrap break-words leading-relaxed text-base line-clamp-3">${safeLine}</div>
+                        </div>
                         <div class="flex gap-2 text-gray-400 shrink-0 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="event.stopPropagation(); deleteLine(${index})" class="p-2 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition" title="Delete Note">
+                            <button onclick="event.stopPropagation(); window.deleteLine(${index})" class="p-2 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition" title="Delete Note">
                                 <i data-lucide="trash-2" class="w-5 h-5"></i>
                             </button>
                             <button class="p-2 text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Edit Note">
@@ -426,16 +477,19 @@
             card.className = "w-full border-2 border-primary dark:border-primary bg-white dark:bg-gray-900 p-4 md:p-5 rounded-xl shadow-lg transition pop-animation";
             card.onclick = null; 
             
+            // Revert placeholder character back to real newline for editing
+            const editableText = lines[index].replace(/ ↵ /g, '\n');
+
             card.innerHTML = `
-                <textarea id="inline-input" class="w-full bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none resize-none text-lg leading-relaxed border-b border-gray-200 dark:border-gray-800 pb-3 mb-3" rows="3" placeholder="Edit your note..."></textarea>
+                <textarea id="inline-input" class="w-full bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none resize-none text-base md:text-lg leading-relaxed border-b border-gray-200 dark:border-gray-800 pb-3 mb-3 min-w-0 whitespace-pre-wrap" rows="4" placeholder="Edit your note..."></textarea>
                 <div class="flex justify-end gap-2">
-                    <button id="cancel-inline-btn" onclick="cancelInlineEdit()" class="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition flex items-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Cancel</button>
-                    <button id="save-inline-btn" onclick="saveInlineEdit(${index})" class="px-6 py-2.5 bg-primary hover:bg-blue-700 text-white font-semibold rounded-lg transition shadow-sm flex items-center gap-2 disabled:opacity-80"><i data-lucide="check" class="w-4 h-4"></i> Save</button>
+                    <button id="cancel-inline-btn" onclick="window.cancelInlineEdit()" class="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition flex items-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Cancel</button>
+                    <button id="save-inline-btn" onclick="window.saveInlineEdit(${index})" class="px-6 py-2.5 bg-primary hover:bg-blue-700 text-white font-semibold rounded-lg transition shadow-sm flex items-center gap-2 disabled:opacity-80"><i data-lucide="check" class="w-4 h-4"></i> Save</button>
                 </div>
             `;
             
             const input = document.getElementById('inline-input');
-            input.value = lines[index];
+            input.value = editableText;
             input.focus();
             input.setSelectionRange(input.value.length, input.value.length);
             lucide.createIcons();
@@ -456,7 +510,8 @@
             cancelBtn.disabled = true;
             lucide.createIcons();
 
-            const newVal = document.getElementById('inline-input').value.trim();
+            // Convert newlines back to placeholder so it stays in one box on Firebase
+            const newVal = document.getElementById('inline-input').value.trim().replace(/\r?\n/g, ' ↵ ');
             let lines = latestText.split('\n').filter(line => line.trim() !== '');
             
             if (newVal === "") { lines.splice(index, 1); }
@@ -484,7 +539,7 @@
             });
         }
 
-        // ================= FIREBASE SYNC =================
+        // ================= FIREBASE SYNC (ORIGINAL LOGIC) =================
         async function updateFirebaseText(newText) {
             try {
                 await setDoc(noteDocRef, { text: newText, timestamp: new Date().getTime() });
@@ -523,7 +578,8 @@
 
         // ================= GLOBAL ACTIONS W/ LOADERS =================
         quickSendBtn.addEventListener('click', async () => {
-            const newText = quickInput.value.trim();
+            // Convert newline to placeholder so it stays in one box
+            const newText = quickInput.value.trim().replace(/\r?\n/g, ' ↵ ');
             if(!newText) return;
             const combinedText = latestText ? `${latestText}\n${newText}` : newText;
             
@@ -554,7 +610,9 @@
         copyBtn.addEventListener('click', async () => {
             try {
                 if(!latestText.trim()) return;
-                await navigator.clipboard.writeText(latestText);
+                // Revert placeholder character back to real newline for copying
+                const trueText = latestText.replace(/ ↵ /g, '\n');
+                await navigator.clipboard.writeText(trueText);
                 
                 const original = copyBtn.innerHTML;
                 copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Copied!`;
@@ -585,7 +643,8 @@
         // Download logic
         document.getElementById('downloadBtn').addEventListener('click', () => {
             if(!latestText) return;
-            const blob = new Blob([latestText], { type: 'text/plain' });
+            const trueText = latestText.replace(/ ↵ /g, '\n');
+            const blob = new Blob([trueText], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url; a.download = `ShareLink_Backup_${new Date().toLocaleDateString()}.txt`; a.click();
