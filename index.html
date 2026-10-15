@@ -40,7 +40,16 @@
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         body { transition: background-color 0.3s, color 0.3s; overscroll-behavior-y: none; }
         .pop-animation { transition: all 0.3s ease-in-out; }
-        #netlify-toolbar, netlify-toolbar { display: none !important; }
+        
+        /* ================= VERCEL & NETLIFY WATERMARK REMOVER ================= */
+        #netlify-badge, netlify-badge, #netlify-toolbar, netlify-toolbar, netlify-web-toolbar, .netlify-badge,
+        #vercel-toolbar, vercel-toolbar, .vercel-toolbar, #vercel-live-feedback, vercel-live-feedback { 
+            display: none !important; 
+            visibility: hidden !important; 
+            opacity: 0 !important; 
+            pointer-events: none !important; 
+            z-index: -9999 !important;
+        }
 
         /* ================= TITLE FEATURE STYLES ================= */
 
