@@ -97,7 +97,7 @@
         .dark .name-toggle-icon:hover { color: #60a5fa; border-color: #3b82f6; }
         .name-toggle-icon[aria-pressed="true"],
         .dark .name-toggle-icon[aria-pressed="true"] {
-            background: #0f172a; border-color: #0f172a; color: #fbbf24;
+            background: #0f172a; border-color: #0f172a; color: #ffffff;
             box-shadow: 0 4px 10px -2px rgba(15,23,42,.45);
         }
 
@@ -107,6 +107,14 @@
 
         /* Edit mode: card that has a title gets an amber edge */
         .named-accent { border-left-width: 4px !important; border-left-color: #f59e0b !important; }
+
+        /* Search icon (header) jab search bar khula ho */
+        #searchBtn[aria-pressed="true"] { background: rgba(37,99,235,.12); color: #2563eb; }
+        .dark #searchBtn[aria-pressed="true"] { background: rgba(96,165,250,.18); color: #60a5fa; }
+
+        /* Title me jo text match hua uska highlight */
+        mark.search-hit { background: rgba(245,158,11,.30); color: inherit; border-radius: 3px; padding: 0 1px; }
+        .dark mark.search-hit { background: rgba(245,158,11,.40); }
 
         @media (prefers-reduced-motion: reduce) {
             .name-collapse, .title-pill, .name-toggle-icon { transition: none !important; }
@@ -139,8 +147,8 @@
             <button id="themeToggleBtn" class="p-2.5 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Toggle Theme">
                 <i data-lucide="moon" id="themeIcon" class="w-5 h-5"></i>
             </button>
-            <button id="downloadBtn" class="p-2.5 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Download Backup">
-                <i data-lucide="download" class="w-5 h-5"></i>
+            <button id="searchBtn" type="button" aria-pressed="false" class="p-2.5 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Search by title">
+                <i data-lucide="search" class="w-5 h-5"></i>
             </button>
             <button id="qrBtn" class="p-2.5 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Show QR Code">
                 <i data-lucide="qr-code" class="w-5 h-5"></i>
@@ -152,6 +160,24 @@
             </button>
         </div>
     </header>
+
+    <!-- SEARCH BAR (search icon par click karne se khulta hai) -->
+    <div id="searchBar" class="name-collapse w-full shrink-0 z-10">
+        <div class="nc-wrap">
+            <div class="px-4 py-3 md:px-8 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+                <div class="w-full max-w-4xl mx-auto flex items-center gap-3">
+                    <div class="relative flex-1 min-w-0">
+                        <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        <input type="text" id="searchInput" autocomplete="off" spellcheck="false" enterkeyhint="search" class="w-full bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl pl-11 pr-4 py-2.5 md:py-3 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition text-gray-900 dark:text-gray-100 placeholder-gray-400" placeholder="Search by title...">
+                    </div>
+                    <span id="searchCount" class="hidden shrink-0 text-xs md:text-sm font-semibold text-gray-500 dark:text-gray-400 whitespace-nowrap"></span>
+                    <button id="searchCloseBtn" type="button" class="shrink-0 p-2.5 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white active:scale-95 transition" title="Close search">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- MAIN APP AREA -->
     <main class="flex-1 w-full relative overflow-hidden flex flex-col bg-gray-50 dark:bg-gray-950 transition-colors">
@@ -173,8 +199,8 @@
                     <div id="quickNameCollapse" class="name-collapse w-full">
                         <div class="nc-wrap"><div class="nc-inner">
                             <div class="relative">
-                                <i data-lucide="tag" class="w-4 h-4 text-amber-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                                <input type="text" id="quickName" maxlength="40" autocomplete="off" class="w-full min-w-0 bg-amber-50/70 dark:bg-amber-500/10 border border-amber-300/70 dark:border-amber-500/30 rounded-xl pl-10 pr-4 py-3 md:py-3.5 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-base md:text-lg transition text-gray-900 dark:text-gray-100 placeholder-gray-400" placeholder="Title, e.g. Bigg Boss movie">
+                                <i data-lucide="tag" class="w-4 h-4 text-gray-500 dark:text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                                <input type="text" id="quickName" maxlength="40" autocomplete="off" class="w-full min-w-0 bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl pl-10 pr-4 py-3 md:py-3.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition text-gray-900 dark:text-gray-100 placeholder-gray-400" placeholder="Title, e.g. Bigg Boss movie">
                             </div>
                         </div></div>
                     </div>
@@ -241,8 +267,8 @@
             <div id="addNameCollapse" class="name-collapse w-full">
                 <div class="nc-wrap"><div class="nc-inner">
                     <div class="relative">
-                        <i data-lucide="tag" class="w-4 h-4 text-amber-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                        <input type="text" id="newNameInput" maxlength="40" autocomplete="off" class="w-full bg-amber-50/70 dark:bg-amber-500/10 border border-amber-300/70 dark:border-amber-500/30 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-base md:text-lg font-semibold transition text-gray-900 dark:text-gray-100 placeholder-gray-400 placeholder:font-normal" placeholder="Give this link a name (e.g. My Portfolio)">
+                        <i data-lucide="tag" class="w-4 h-4 text-gray-500 dark:text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        <input type="text" id="newNameInput" maxlength="40" autocomplete="off" class="w-full bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg font-semibold transition text-gray-900 dark:text-gray-100 placeholder-gray-400 placeholder:font-normal" placeholder="Give this link a name (e.g. My Portfolio)">
                     </div>
                 </div></div>
             </div>
@@ -345,7 +371,7 @@
         const NAME_OPEN = '⟪';
         const NAME_CLOSE = '⟫';
         const URL_REGEX = /(https?:\/\/[^\s<"']+)/g;
-        const NAME_INPUT_CLASS = "w-full bg-amber-50/70 dark:bg-amber-500/10 border border-amber-300/70 dark:border-amber-500/30 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-base md:text-lg font-semibold transition text-gray-900 dark:text-gray-100 placeholder-gray-400 placeholder:font-normal";
+        const NAME_INPUT_CLASS = "w-full bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg font-semibold transition text-gray-900 dark:text-gray-100 placeholder-gray-400 placeholder:font-normal";
 
         function sanitizeName(str) {
             return (str || "").split(TITLE_SEP).join(' ').replace(/[⟪⟫\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
@@ -574,6 +600,91 @@
             }
         }
 
+        // ================= SEARCH BY TITLE =================
+        // Search icon -> search bar khulta hai. Type karte hi (bina Enter ke) sirf TITLE se match hota hai, link/text se nahi.
+        const searchBtn = document.getElementById('searchBtn');
+        const searchBar = document.getElementById('searchBar');
+        const searchInput = document.getElementById('searchInput');
+        const searchCloseBtn = document.getElementById('searchCloseBtn');
+        const searchCount = document.getElementById('searchCount');
+        let searchTerms = [];
+
+        // Har word title me hona chahiye ("big boss" -> "Big Boss 39 Episode" mil jaayega)
+        function titleMatches(name) {
+            if (!name) return false;
+            const t = name.toLowerCase();
+            return searchTerms.every(term => t.includes(term));
+        }
+
+        // Title ke jo hisse match hue unko highlight karta hai (HTML safe)
+        function highlightTitle(name) {
+            if (!searchTerms.length) return escapeHTML(name);
+            const lower = name.toLowerCase();
+            if (lower.length !== name.length) return escapeHTML(name);
+            const hit = new Array(name.length).fill(false);
+            searchTerms.forEach(term => {
+                let i = lower.indexOf(term);
+                while (i !== -1) {
+                    for (let k = i; k < i + term.length; k++) hit[k] = true;
+                    i = lower.indexOf(term, i + term.length);
+                }
+            });
+            let out = '', buf = '', on = false;
+            for (let k = 0; k < name.length; k++) {
+                if (hit[k] !== on) {
+                    out += on ? `<mark class="search-hit">${escapeHTML(buf)}</mark>` : escapeHTML(buf);
+                    buf = '';
+                    on = hit[k];
+                }
+                buf += name[k];
+            }
+            out += on ? `<mark class="search-hit">${escapeHTML(buf)}</mark>` : escapeHTML(buf);
+            return out;
+        }
+
+        function noMatchHTML() {
+            return `
+                <div class="flex flex-col items-center justify-center h-full opacity-40 mt-10 text-center px-6">
+                    <i data-lucide="search" class="w-16 h-16 mb-4"></i>
+                    <p class="text-xl font-semibold">No title found</p>
+                    <p class="mt-1 text-sm break-all">Nothing matches "${escapeHTML(searchInput.value.trim())}"</p>
+                </div>`;
+        }
+
+        function updateSearchCount() {
+            if (!searchTerms.length) { searchCount.classList.add('hidden'); return; }
+            const n = getLines().filter(line => titleMatches(parseLine(line).name)).length;
+            searchCount.textContent = `${n} found`;
+            searchCount.classList.remove('hidden');
+        }
+
+        function applySearch() {
+            const q = searchInput.value.trim().toLowerCase();
+            searchTerms = q ? q.split(/\s+/) : [];
+            renderViewModeText(latestText);
+            if (isEditMode && activeEditIndex === null) renderEditModeText();
+            updateSearchCount();
+        }
+
+        function setSearchOpen(open) {
+            searchBar.classList.toggle('open', open);
+            searchBtn.setAttribute('aria-pressed', open ? 'true' : 'false');
+            if (open) {
+                setTimeout(() => searchInput.focus(), 280);
+            } else {
+                searchInput.blur();
+                if (searchInput.value !== '') { searchInput.value = ''; applySearch(); }
+            }
+        }
+
+        searchBtn.addEventListener('click', () => setSearchOpen(!searchBar.classList.contains('open')));
+        searchCloseBtn.addEventListener('click', () => setSearchOpen(false));
+        searchInput.addEventListener('input', applySearch);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') setSearchOpen(false);
+            if (e.key === 'Enter') { e.preventDefault(); searchInput.blur(); }
+        });
+
         // ================= VIEW MODE RENDER =================
         function renderViewModeText(text) {
             if (!text || text.trim() === "") {
@@ -592,6 +703,7 @@
             let htmlContent = "";
             lines.forEach((rawLine, index) => {
                 const { name, content } = parseLine(rawLine);
+                if (searchTerms.length && !titleMatches(name)) return; // search: sirf title se
 
                 // ---------- CARD WITH TITLE: white card (plain card jaisa clear), upar title, neeche link/text ----------
                 if (name) {
@@ -603,7 +715,7 @@
                         <div ${clickAttr} class="named-card named-accent note-box group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 rounded-xl text-gray-800 dark:text-gray-200 shadow-sm transition hover:shadow-md ${firstUrl ? 'cursor-pointer' : ''} flex flex-col overflow-hidden relative">
                             <div class="flex items-center gap-2.5 px-3.5 md:px-4 ${hasBody ? 'pt-3 pb-2.5 shrink-0' : 'flex-1'}">
                                 <i data-lucide="tag" class="w-5 h-5 shrink-0 text-amber-500"></i>
-                                <span class="flex-1 min-w-0 font-bold text-gray-900 dark:text-white text-lg md:text-xl leading-snug truncate">${escapeHTML(name)}</span>
+                                <span class="flex-1 min-w-0 font-bold text-gray-900 dark:text-white text-lg md:text-xl leading-snug truncate">${highlightTitle(name)}</span>
                                 ${hasBody ? `
                                 <div class="flex items-center gap-1 shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                                     ${firstUrl ? `<div class="text-primary p-1.5"><i data-lucide="external-link" class="w-5 h-5"></i></div>` : ''}
@@ -648,7 +760,7 @@
                 `;
             });
             
-            notesContainer.innerHTML = htmlContent;
+            notesContainer.innerHTML = htmlContent || noMatchHTML();
             lucide.createIcons();
             
             // Auto-scroll to top so latest new data is always visible immediately
@@ -669,6 +781,7 @@
             let htmlContent = "";
             lines.forEach((rawLine, index) => {
                 const { name, content } = parseLine(rawLine);
+                if (searchTerms.length && !titleMatches(name)) return; // search: sirf title se
                 const safeLine = escapeHTML(content);
                 const hasName = name !== "";
                 
@@ -679,7 +792,7 @@
                             ${hasName ? `
                             <div class="flex items-center gap-1.5 font-bold text-gray-900 dark:text-white text-sm md:text-base mb-0.5 min-w-0">
                                 <i data-lucide="tag" class="w-4 h-4 shrink-0 text-amber-500"></i>
-                                <span class="truncate">${escapeHTML(name)}</span>
+                                <span class="truncate">${highlightTitle(name)}</span>
                             </div>` : ''}
                             <div class="whitespace-pre-wrap break-words leading-relaxed ${hasName ? 'text-sm md:text-base text-gray-500 dark:text-gray-400 line-clamp-2' : 'text-base md:text-lg line-clamp-3'}">${safeLine}</div>
                         </div>
@@ -695,7 +808,7 @@
                 `;
             });
             
-            editNotesContainer.innerHTML = htmlContent;
+            editNotesContainer.innerHTML = htmlContent || noMatchHTML();
             lucide.createIcons();
         }
 
@@ -712,7 +825,7 @@
 
             card.innerHTML = `
                 <div class="relative mb-3">
-                    <i data-lucide="tag" class="w-4 h-4 text-amber-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    <i data-lucide="tag" class="w-4 h-4 text-gray-500 dark:text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                     <input type="text" id="inline-name" maxlength="40" autocomplete="off" class="${NAME_INPUT_CLASS}" placeholder="Title / Name (Optional)">
                 </div>
                 <textarea id="inline-input" class="w-full bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none resize-none text-base md:text-lg leading-relaxed border-b border-gray-200 dark:border-gray-800 pb-3 mb-3 min-w-0 whitespace-pre-wrap" rows="4" placeholder="Edit your note..."></textarea>
@@ -809,6 +922,7 @@
             if (isEditMode && activeEditIndex === null) {
                 renderEditModeText();
             }
+            updateSearchCount();
         }, (error) => {
             statusIndicator.innerText = "Offline";
             statusIndicator.classList.replace('text-emerald-600', 'text-red-500');
@@ -897,16 +1011,7 @@
             qrModal.classList.add('hidden-mode');
         });
         
-        // Download logic
-        document.getElementById('downloadBtn').addEventListener('click', () => {
-            if(!latestText) return;
-            const trueText = getPlainTextAll();
-            const blob = new Blob([trueText], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = `ShareLink.txt`; a.click();
-            URL.revokeObjectURL(url);
-        });
+        
 
     </script>
 </body>
