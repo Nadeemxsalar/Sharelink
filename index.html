@@ -40,6 +40,67 @@
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         body { transition: background-color 0.3s, color 0.3s; overscroll-behavior-y: none; }
         .pop-animation { transition: all 0.3s ease-in-out; }
+
+        /* ================= TITLE FEATURE STYLES ================= */
+
+        /* Title field that slides open (Add popup + quick bar) */
+        .name-collapse {
+            display: grid;
+            grid-template-rows: 0fr;
+            opacity: 0;
+            visibility: hidden;
+            transition: grid-template-rows .3s ease, opacity .25s ease, visibility 0s linear .3s;
+        }
+        .name-collapse.open {
+            grid-template-rows: 1fr;
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 0s;
+        }
+        .name-collapse > .nc-wrap { overflow: hidden; min-height: 0; }
+        .nc-inner { padding: 3px 3px 12px; }
+
+        /* "Add Title" tag pill (Add popup header) -> turns into red "Remove Title" */
+        .title-pill {
+            display: flex; align-items: center; gap: .375rem;
+            padding: .375rem .8rem; border-radius: 999px;
+            background: #eff6ff; color: #2563eb;
+            font-size: .8125rem; font-weight: 600; line-height: 1.2;
+            cursor: pointer; transition: background .2s ease, color .2s ease, transform .15s ease;
+        }
+        .title-pill:hover { background: #dbeafe; }
+        .title-pill:active { transform: scale(.95); }
+        .title-pill[aria-pressed="true"] { background: #fef2f2; color: #ef4444; }
+        .title-pill[aria-pressed="true"]:hover { background: #fee2e2; }
+        .dark .title-pill { background: rgba(30,58,138,.4); color: #60a5fa; }
+        .dark .title-pill:hover { background: rgba(30,58,138,.6); }
+        .dark .title-pill[aria-pressed="true"] { background: rgba(127,29,29,.4); color: #f87171; }
+
+        /* Icon-only tag toggle (bottom quick add bar) */
+        .name-toggle-icon {
+            flex-shrink: 0; width: 3rem; display: flex; align-items: center; justify-content: center;
+            border-radius: .75rem; border: 1px solid #d1d5db; background: #f9fafb; color: #64748b;
+            cursor: pointer; transition: all .25s ease;
+        }
+        .name-toggle-icon:hover { color: #2563eb; border-color: #2563eb; }
+        .dark .name-toggle-icon { border-color: #374151; background: #030712; color: #94a3b8; }
+        .dark .name-toggle-icon:hover { color: #60a5fa; border-color: #3b82f6; }
+        .name-toggle-icon[aria-pressed="true"],
+        .dark .name-toggle-icon[aria-pressed="true"] {
+            background: #0f172a; border-color: #0f172a; color: #fbbf24;
+            box-shadow: 0 4px 10px -2px rgba(15,23,42,.45);
+        }
+
+        /* Sabhi cards ka size same rahega (view + edit list), chahe link/text chhota ho ya bahut lamba */
+        .note-box { height: 8rem; }
+        @media (min-width: 768px) { .note-box { height: 8.75rem; } }
+
+        /* Edit mode: card that has a title gets an amber edge */
+        .named-accent { border-left-width: 4px !important; border-left-color: #f59e0b !important; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .name-collapse, .title-pill, .name-toggle-icon { transition: none !important; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 h-[100dvh] w-screen overflow-hidden flex flex-col font-sans">
@@ -97,12 +158,27 @@
 
             <!-- Quick Add Bar -->
             <div class="w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-3 md:p-4 shrink-0 flex justify-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 transition-colors pb-safe">
-                <div class="w-full max-w-4xl flex gap-2">
-                    <input type="text" id="quickInput" class="flex-1 min-w-0 bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-4 md:px-5 py-3 md:py-3.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition" placeholder="Paste link or type note here...">
-                    <button id="quickSendBtn" class="shrink-0 bg-primary hover:bg-blue-700 text-white px-4 md:px-8 py-3 md:py-3.5 rounded-xl font-semibold transition shadow-sm flex items-center gap-2">
-                        <span class="hidden md:inline">Send</span>
-                        <i data-lucide="send" class="w-5 h-5"></i>
-                    </button>
+                <div class="w-full max-w-4xl flex flex-col">
+                    <!-- Title field (slides open when the tag button is on) -->
+                    <div id="quickNameCollapse" class="name-collapse w-full">
+                        <div class="nc-wrap"><div class="nc-inner">
+                            <div class="relative">
+                                <i data-lucide="tag" class="w-4 h-4 text-amber-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                                <input type="text" id="quickName" maxlength="40" autocomplete="off" class="w-full min-w-0 bg-amber-50/70 dark:bg-amber-500/10 border border-amber-300/70 dark:border-amber-500/30 rounded-xl pl-10 pr-4 py-3 md:py-3.5 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-base md:text-lg transition text-gray-900 dark:text-gray-100 placeholder-gray-400" placeholder="Title, e.g. Bigg Boss movie">
+                            </div>
+                        </div></div>
+                    </div>
+
+                    <div class="w-full flex gap-2">
+                        <button id="quickNameToggle" type="button" data-name-toggle data-target="quickNameCollapse" aria-pressed="false" class="name-toggle-icon" title="Add a title">
+                            <i data-lucide="tag" class="w-5 h-5"></i>
+                        </button>
+                        <input type="text" id="quickInput" class="flex-1 min-w-0 bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-4 md:px-5 py-3 md:py-3.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition" placeholder="Paste link or type note here...">
+                        <button id="quickSendBtn" class="shrink-0 bg-primary hover:bg-blue-700 text-white px-4 md:px-8 py-3 md:py-3.5 rounded-xl font-semibold transition shadow-sm flex items-center gap-2">
+                            <span class="hidden md:inline">Send</span>
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -140,10 +216,26 @@
 
     <!-- ================= CUSTOM POP-UPS & MODALS ================= -->
     
-    <!-- 1. Add / Paste New Note Modal -->
+    <!-- 1. Add / Paste New Note Modal (with Add Title tag) -->
     <div id="addNoteModal" class="hidden-mode pop-animation fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex justify-center items-center p-4">
-        <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-lg w-full relative">
-            <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white w-full text-left">Add New Link or Text</h2>
+        <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-lg w-full relative max-h-[92dvh] overflow-y-auto">
+            <div class="flex justify-between items-center gap-3 w-full mb-4">
+                <h2 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white leading-tight">Add New Link or Text</h2>
+                <!-- Add Title tag -->
+                <button type="button" id="addNameToggle" data-name-toggle data-target="addNameCollapse" data-on-text="Remove Title" data-off-text="Add Title" aria-pressed="false" class="title-pill shrink-0">
+                    <i data-lucide="tag" class="w-3.5 h-3.5"></i><span data-label>Add Title</span>
+                </button>
+            </div>
+
+            <!-- Title field (opens when the tag is clicked) -->
+            <div id="addNameCollapse" class="name-collapse w-full">
+                <div class="nc-wrap"><div class="nc-inner">
+                    <div class="relative">
+                        <i data-lucide="tag" class="w-4 h-4 text-amber-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        <input type="text" id="newNameInput" maxlength="40" autocomplete="off" class="w-full bg-amber-50/70 dark:bg-amber-500/10 border border-amber-300/70 dark:border-amber-500/30 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-base md:text-lg font-semibold transition text-gray-900 dark:text-gray-100 placeholder-gray-400 placeholder:font-normal" placeholder="Give this link a name (e.g. My Portfolio)">
+                    </div>
+                </div></div>
+            </div>
             
             <textarea id="newNoteInput" class="w-full bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition text-gray-900 dark:text-gray-100 mb-6 resize-none whitespace-pre-wrap" rows="5" placeholder="Type or Paste Code here..."></textarea>
             
@@ -223,6 +315,8 @@
         const clearBtn = document.getElementById('clearBtn');
         const quickInput = document.getElementById('quickInput');
         const quickSendBtn = document.getElementById('quickSendBtn');
+        const quickName = document.getElementById('quickName');
+        const quickNameToggle = document.getElementById('quickNameToggle');
         const statusIndicator = document.getElementById('statusIndicator');
         const statusDot = document.getElementById('statusDot');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -233,9 +327,90 @@
         let latestText = "";
         let activeEditIndex = null;
 
+        // ================= TITLE HELPERS =================
+        // Ek note ek line hota hai. Title ho to line "Title[::TITLE::]content" format me save hoti hai.
+        // Bina title wale (purane) notes bilkul pehle jaise hi rehte hain.
+        // (Pehle wala "⟪Title⟫ content" format bhi padh liya jaata hai, edit karke save karne par naye format me ho jaata hai.)
+        const TITLE_SEP = '[::TITLE::]';
+        const NAME_OPEN = '⟪';
+        const NAME_CLOSE = '⟫';
+        const URL_REGEX = /(https?:\/\/[^\s<"']+)/g;
+        const NAME_INPUT_CLASS = "w-full bg-amber-50/70 dark:bg-amber-500/10 border border-amber-300/70 dark:border-amber-500/30 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-base md:text-lg font-semibold transition text-gray-900 dark:text-gray-100 placeholder-gray-400 placeholder:font-normal";
+
+        function sanitizeName(str) {
+            return (str || "").split(TITLE_SEP).join(' ').replace(/[⟪⟫\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
+        }
+
+        function parseLine(raw) {
+            let name = "";
+            let body = raw;
+            if (raw.startsWith(NAME_OPEN) && raw.indexOf(NAME_CLOSE) > 0) {
+                const end = raw.indexOf(NAME_CLOSE);
+                name = raw.slice(1, end).trim();
+                body = raw.slice(end + 1);
+            } else if (raw.includes(TITLE_SEP)) {
+                const i = raw.indexOf(TITLE_SEP);
+                name = raw.slice(0, i).trim();
+                body = raw.slice(i + TITLE_SEP.length);
+            }
+            return { name, content: body.trim().replace(/ ↵ /g, '\n') };
+        }
+
+        // encodedContent = already converted newlines to " ↵ "
+        function buildLine(name, encodedContent) {
+            return name ? `${name}${TITLE_SEP}${encodedContent}` : encodedContent;
+        }
+
+        function getLines(text = latestText) {
+            return text.split('\n').filter(line => line.trim() !== '');
+        }
+
+        function lineToPlainText(raw) {
+            const { name, content } = parseLine(raw);
+            if (!name) return content;
+            if (!content) return name;
+            return content.includes('\n') ? `${name}:\n${content}` : `${name}: ${content}`;
+        }
+
+        function highlightUrls(text, cls) {
+            let safe = escapeHTML(text);
+            const rawUrls = text.match(URL_REGEX) || [];
+            [...new Set(rawUrls)].forEach(url => {
+                const escapedUrl = escapeHTML(url);
+                safe = safe.split(escapedUrl).join(`<span class="${cls}">${escapedUrl}</span>`);
+            });
+            return { safe, firstUrl: rawUrls.length > 0 ? rawUrls[0] : null };
+        }
+
+        // ---- Title tag toggle (quick bar tag + "Add Title" pill) ----
+        function isNameOn(btn) {
+            return btn && btn.getAttribute('aria-pressed') === 'true';
+        }
+
+        function setNameField(btn, open, focus) {
+            btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+            const label = btn.querySelector('[data-label]');
+            if (label) label.textContent = open ? btn.dataset.onText : btn.dataset.offText;
+            const collapse = document.getElementById(btn.dataset.target);
+            if (!collapse) return;
+            collapse.classList.toggle('open', open);
+            if (open && focus) {
+                const input = collapse.querySelector('input');
+                if (input) setTimeout(() => input.focus(), 280);
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-name-toggle]');
+            if (!btn) return;
+            setNameField(btn, !isNameOn(btn), true);
+        });
+
         // ================= CUSTOM ADD/PASTE NEW MODAL LOGIC =================
         const addNoteModal = document.getElementById('addNoteModal');
         const newNoteInput = document.getElementById('newNoteInput');
+        const newNameInput = document.getElementById('newNameInput');
+        const addNameToggle = document.getElementById('addNameToggle');
         const cancelAddBtn = document.getElementById('cancelAddBtn');
         const saveAddBtn = document.getElementById('saveAddBtn');
 
@@ -243,7 +418,13 @@
             addNoteModal.classList.remove('hidden-mode');
             addNoteModal.classList.add('modal-active');
             newNoteInput.value = ""; 
+            newNameInput.value = "";
+            setNameField(addNameToggle, false, false);
             setTimeout(() => newNoteInput.focus(), 100);
+        });
+
+        newNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); newNoteInput.focus(); }
         });
 
         cancelAddBtn.addEventListener('click', () => {
@@ -255,6 +436,9 @@
             const textToAdd = newNoteInput.value.trim().replace(/\r?\n/g, ' ↵ ');
             if (textToAdd === "") return;
 
+            const name = isNameOn(addNameToggle) ? sanitizeName(newNameInput.value) : "";
+            const newLine = buildLine(name, textToAdd);
+
             const originalHtml = saveAddBtn.innerHTML;
             saveAddBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Saving...`;
             saveAddBtn.disabled = true;
@@ -262,7 +446,7 @@
             lucide.createIcons();
 
             // FIXED: Naya data aage add kiya (Prepend) taaki wo sabse top par aaye
-            const combinedText = latestText ? `${textToAdd}\n${latestText}` : textToAdd;
+            const combinedText = latestText ? `${newLine}\n${latestText}` : newLine;
             const success = await updateFirebaseText(combinedText);
             
             saveAddBtn.innerHTML = originalHtml;
@@ -357,22 +541,23 @@
         }
 
         // Extract string via Index securely so quotes don't break HTML layout
+        // (titled notes: sirf link/text copy hota hai, title nahi)
         window.copySingleNote = function(index) {
             try {
-                const lines = latestText.split('\n').filter(line => line.trim() !== '');
+                const lines = getLines();
                 if(lines[index]) {
-                    const textToCopy = lines[index].replace(/ ↵ /g, '\n');
-                    navigator.clipboard.writeText(textToCopy);
+                    const { content } = parseLine(lines[index]);
+                    navigator.clipboard.writeText(content);
                 }
             } catch(e) { console.error(e); }
         }
 
         window.openSafeUrl = function(index, event) {
             if(event) event.stopPropagation(); // Stop parent click
-            const lines = latestText.split('\n').filter(line => line.trim() !== '');
+            const lines = getLines();
             if(lines[index]) {
-                const urlRegex = /(https?:\/\/[^\s<"']+)/g;
-                const matches = lines[index].match(urlRegex);
+                const { content } = parseLine(lines[index]);
+                const matches = content.match(URL_REGEX);
                 if (matches && matches.length > 0) {
                     window.open(matches[0], '_blank');
                 }
@@ -392,30 +577,51 @@
                 return;
             }
 
-            const urlRegex = /(https?:\/\/[^\s<"']+)/g;
-            const lines = text.split('\n').filter(line => line.trim() !== '');
+            const lines = getLines(text);
             
             let htmlContent = "";
             lines.forEach((rawLine, index) => {
-                const displayLine = rawLine.replace(/ ↵ /g, '\n');
-                
-                let safeLine = escapeHTML(displayLine);
-                
-                const rawUrls = displayLine.match(urlRegex) || [];
-                const firstUrl = rawUrls.length > 0 ? rawUrls[0] : null; 
-                
-                const uniqueUrls = [...new Set(rawUrls)];
-                uniqueUrls.forEach(url => {
-                    const escapedUrl = escapeHTML(url);
-                    safeLine = safeLine.split(escapedUrl).join(`<span class="text-primary font-semibold underline underline-offset-2">${escapedUrl}</span>`);
-                });
+                const { name, content } = parseLine(rawLine);
+
+                // ---------- CARD WITH TITLE: white card (plain card jaisa clear), upar title, neeche link/text ----------
+                if (name) {
+                    const hasBody = content.trim() !== "";
+                    const { safe: safeBody, firstUrl } = highlightUrls(content, "text-primary font-semibold underline underline-offset-2");
+                    const clickAttr = firstUrl ? `onclick="window.openSafeUrl(${index}, event)"` : '';
+
+                    htmlContent += `
+                        <div ${clickAttr} class="named-card named-accent note-box group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 rounded-xl text-gray-800 dark:text-gray-200 shadow-sm transition hover:shadow-md ${firstUrl ? 'cursor-pointer' : ''} flex flex-col overflow-hidden relative">
+                            <div class="flex items-center gap-2.5 px-3.5 md:px-4 ${hasBody ? 'pt-3 pb-2.5 shrink-0' : 'flex-1'}">
+                                <i data-lucide="tag" class="w-5 h-5 shrink-0 text-amber-500"></i>
+                                <span class="flex-1 min-w-0 font-bold text-gray-900 dark:text-white text-lg md:text-xl leading-snug truncate">${escapeHTML(name)}</span>
+                                ${hasBody ? `
+                                <div class="flex items-center gap-1 shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                    ${firstUrl ? `<div class="text-primary p-1.5"><i data-lucide="external-link" class="w-5 h-5"></i></div>` : ''}
+                                    <button onclick="event.stopPropagation(); window.copySingleNote(${index})" class="p-1.5 text-gray-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Copy">
+                                        <i data-lucide="copy" class="w-5 h-5"></i>
+                                    </button>
+                                </div>` : ''}
+                            </div>
+                            ${hasBody ? `
+                            <div class="mx-3.5 md:mx-4 border-t border-dashed border-gray-200 dark:border-gray-700 shrink-0"></div>
+                            <div class="flex-1 min-h-0 flex items-center gap-3 px-3.5 md:px-4 overflow-hidden">
+                                <i data-lucide="${firstUrl ? 'link' : 'align-left'}" class="w-5 h-5 shrink-0 text-gray-400 group-hover:text-primary transition-colors"></i>
+                                <div class="min-w-0 flex-1 whitespace-pre-wrap break-words leading-relaxed text-base md:text-lg line-clamp-2">${safeBody}</div>
+                            </div>` : ''}
+                        </div>
+                    `;
+                    return;
+                }
+
+                // ---------- NORMAL CARD (bina title, bilkul pehle jaisa) ----------
+                const { safe: safeLine, firstUrl } = highlightUrls(content, "text-primary font-semibold underline underline-offset-2");
 
                 const iconName = firstUrl ? 'link' : 'align-left';
                 const clickAttr = firstUrl ? `onclick="window.openSafeUrl(${index}, event)"` : '';
                 
                 // UI FIX: Added shrink-0 to prevent box from getting smaller when list overflows
                 htmlContent += `
-                    <div ${clickAttr} class="group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden relative">
+                    <div ${clickAttr} class="note-box group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden relative">
                         <div class="text-gray-400 group-hover:text-primary transition-colors shrink-0 flex items-center justify-center">
                             <i data-lucide="${iconName}" class="w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
@@ -443,7 +649,7 @@
         window.renderEditModeText = function() {
             if (activeEditIndex !== null) return; 
             
-            const lines = latestText.split('\n').filter(line => line.trim() !== '');
+            const lines = getLines();
             if (lines.length === 0) {
                 editNotesContainer.innerHTML = `<div class="text-center text-gray-400 mt-10 flex flex-col items-center"><i data-lucide="file-x" class="w-12 h-12 mb-3 opacity-30"></i> No notes to edit.</div>`;
                 lucide.createIcons();
@@ -452,14 +658,20 @@
 
             let htmlContent = "";
             lines.forEach((rawLine, index) => {
-                const displayLine = rawLine.replace(/ ↵ /g, '\n');
-                let safeLine = escapeHTML(displayLine);
+                const { name, content } = parseLine(rawLine);
+                const safeLine = escapeHTML(content);
+                const hasName = name !== "";
                 
                 // UI FIX: Added shrink-0 to prevent box from getting smaller when list overflows
                 htmlContent += `
-                    <div id="edit-card-${index}" onclick="openInlineEdit(${index})" class="group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center justify-between gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden">
-                        <div class="flex-1 min-w-0 flex items-center">
-                            <div class="whitespace-pre-wrap break-words leading-relaxed text-base md:text-lg line-clamp-3">${safeLine}</div>
+                    <div id="edit-card-${index}" onclick="openInlineEdit(${index})" class="note-box ${hasName ? 'named-accent ' : ''}group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center justify-between gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden">
+                        <div class="flex-1 min-w-0 flex flex-col justify-center">
+                            ${hasName ? `
+                            <div class="flex items-center gap-1.5 font-bold text-gray-900 dark:text-white text-sm md:text-base mb-0.5 min-w-0">
+                                <i data-lucide="tag" class="w-4 h-4 shrink-0 text-amber-500"></i>
+                                <span class="truncate">${escapeHTML(name)}</span>
+                            </div>` : ''}
+                            <div class="whitespace-pre-wrap break-words leading-relaxed ${hasName ? 'text-sm md:text-base text-gray-500 dark:text-gray-400 line-clamp-2' : 'text-base md:text-lg line-clamp-3'}">${safeLine}</div>
                         </div>
                         <div class="flex items-center gap-1 shrink-0 md:opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onclick="event.stopPropagation(); window.deleteLine(${index})" class="p-2 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition" title="Delete Note">
@@ -477,19 +689,22 @@
             lucide.createIcons();
         }
 
-        // ================= INLINE EDIT W/ LOADER =================
+        // ================= INLINE EDIT W/ LOADER (title box always visible, optional) =================
         window.openInlineEdit = function(index) {
             activeEditIndex = index;
-            const lines = latestText.split('\n').filter(line => line.trim() !== '');
+            const lines = getLines();
             const card = document.getElementById(`edit-card-${index}`);
+            const { name, content } = parseLine(lines[index]);
             
             // Added shrink-0 here as well to prevent the edit box from shrinking
             card.className = "w-full shrink-0 border-2 border-primary dark:border-primary bg-white dark:bg-gray-900 p-4 md:p-5 rounded-xl shadow-lg transition pop-animation";
             card.onclick = null; 
-            
-            const editableText = lines[index].replace(/ ↵ /g, '\n');
 
             card.innerHTML = `
+                <div class="relative mb-3">
+                    <i data-lucide="tag" class="w-4 h-4 text-amber-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    <input type="text" id="inline-name" maxlength="40" autocomplete="off" class="${NAME_INPUT_CLASS}" placeholder="Title / Name (Optional)">
+                </div>
                 <textarea id="inline-input" class="w-full bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none resize-none text-base md:text-lg leading-relaxed border-b border-gray-200 dark:border-gray-800 pb-3 mb-3 min-w-0 whitespace-pre-wrap" rows="4" placeholder="Edit your note..."></textarea>
                 <div class="flex justify-end gap-2">
                     <button id="cancel-inline-btn" onclick="window.cancelInlineEdit()" class="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition flex items-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Cancel</button>
@@ -498,7 +713,12 @@
             `;
             
             const input = document.getElementById('inline-input');
-            input.value = editableText;
+            const nameInput = document.getElementById('inline-name');
+            nameInput.value = name;
+            nameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); input.focus(); }
+            });
+            input.value = content;
             input.focus();
             input.setSelectionRange(input.value.length, input.value.length);
             lucide.createIcons();
@@ -520,10 +740,11 @@
             lucide.createIcons();
 
             const newVal = document.getElementById('inline-input').value.trim().replace(/\r?\n/g, ' ↵ ');
-            let lines = latestText.split('\n').filter(line => line.trim() !== '');
+            const newName = sanitizeName(document.getElementById('inline-name').value);
+            let lines = getLines();
             
             if (newVal === "") { lines.splice(index, 1); }
-            else { lines[index] = newVal; }
+            else { lines[index] = buildLine(newName, newVal); }
             
             const success = await updateFirebaseText(lines.join('\n'));
             if (success) {
@@ -539,7 +760,7 @@
 
         window.deleteLine = function(index) {
             showCustomConfirm("Delete this note?", "Are you sure you want to remove this specific note from all devices?", async () => {
-                let lines = latestText.split('\n').filter(line => line.trim() !== '');
+                let lines = getLines();
                 lines.splice(index, 1);
                 await updateFirebaseText(lines.join('\n'));
                 activeEditIndex = null;
@@ -588,9 +809,12 @@
         quickSendBtn.addEventListener('click', async () => {
             const newText = quickInput.value.trim().replace(/\r?\n/g, ' ↵ ');
             if(!newText) return;
+
+            const name = isNameOn(quickNameToggle) ? sanitizeName(quickName.value) : "";
+            const newLine = buildLine(name, newText);
             
             // FIXED: Naya data aage add kiya (Prepend) taaki wo sabse top par aaye
-            const combinedText = latestText ? `${newText}\n${latestText}` : newText;
+            const combinedText = latestText ? `${newLine}\n${latestText}` : newLine;
             
             const originalHTML = quickSendBtn.innerHTML;
             quickSendBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i>`;
@@ -598,7 +822,11 @@
             lucide.createIcons();
             
             const success = await updateFirebaseText(combinedText);
-            if(success) quickInput.value = "";
+            if(success) {
+                quickInput.value = "";
+                quickName.value = "";
+                setNameField(quickNameToggle, false, false);
+            }
             
             setTimeout(() => { 
                 quickSendBtn.innerHTML = originalHTML; 
@@ -607,6 +835,12 @@
             }, 500);
         });
         quickInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') quickSendBtn.click(); });
+        quickName.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (quickInput.value.trim()) quickSendBtn.click(); else quickInput.focus();
+            }
+        });
 
         clearBtn.addEventListener('click', () => {
             if(!latestText.trim()) return; 
@@ -616,10 +850,15 @@
             });
         });
 
+        // Copy All / Download: titled notes "Title: link" format me copy hote hain
+        function getPlainTextAll() {
+            return getLines().map(lineToPlainText).join('\n');
+        }
+
         copyBtn.addEventListener('click', async () => {
             try {
                 if(!latestText.trim()) return;
-                const trueText = latestText.replace(/ ↵ /g, '\n');
+                const trueText = getPlainTextAll();
                 await navigator.clipboard.writeText(trueText);
                 
                 const original = copyBtn.innerHTML;
@@ -651,7 +890,7 @@
         // Download logic
         document.getElementById('downloadBtn').addEventListener('click', () => {
             if(!latestText) return;
-            const trueText = latestText.replace(/ ↵ /g, '\n');
+            const trueText = getPlainTextAll();
             const blob = new Blob([trueText], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
