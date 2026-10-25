@@ -126,14 +126,14 @@
     <!-- TOP NAVBAR -->
     <header class="w-full flex justify-between items-center px-4 py-3 md:px-8 md:py-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm z-20 shrink-0 transition-colors">
         <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2 text-primary font-extrabold text-2xl md:text-3xl tracking-tight">
+            <div id="logoBtn" title="Folders and filter" class="relative cursor-pointer select-none flex items-center gap-2 text-primary font-extrabold text-2xl md:text-3xl tracking-tight">
                 <!-- Inline SVG Logo (Same as Favicon) -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7 md:w-8 md:h-8">
                     <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
                     <path d="M15 7h2a5 5 0 1 1 0 10h-2"/>
                     <line x1="8" x2="16" y1="12" y2="12"/>
                 </svg>
-                <span>Share<span class="text-gray-900 dark:text-white">Link</span></span>
+                <span>Share<span class="text-gray-900 dark:text-white">Link</span></span><span id="navDot" class="hidden absolute -top-0.5 -right-2.5 w-2.5 h-2.5 rounded-full bg-amber-500"></span>
             </div>
             <div class="hidden md:flex items-center gap-2 border-l border-gray-300 dark:border-gray-700 pl-4 ml-2">
                 <span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-yellow-500 animate-pulse"></span>
@@ -179,6 +179,17 @@
         </div>
     </div>
 
+    <!-- FOLDER / FILTER BAR -->
+    <div id="navBar" class="hidden-mode w-full shrink-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 md:px-8 py-1.5">
+        <div class="w-full max-w-4xl mx-auto flex items-center gap-2">
+            <div id="crumbs" class="flex items-center gap-1 text-sm md:text-base font-semibold overflow-x-auto whitespace-nowrap min-w-0 flex-1"></div>
+            <div class="relative shrink-0">
+                <button id="filterBtn" type="button" title="Filter" class="relative p-2.5 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition"><i data-lucide="filter" class="w-5 h-5"></i><span id="filterDot" class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary"></span></button>
+                <div id="filterMenu" class="hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xl p-1.5 z-50"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- MAIN APP AREA -->
     <main class="flex-1 w-full relative overflow-hidden flex flex-col bg-gray-50 dark:bg-gray-950 transition-colors">
         
@@ -209,6 +220,7 @@
                         <button id="quickNameToggle" type="button" data-name-toggle data-target="quickNameCollapse" aria-pressed="false" class="name-toggle-icon" title="Add a title">
                             <i data-lucide="tag" class="w-5 h-5"></i>
                         </button>
+                        
                         <input type="text" id="quickInput" class="flex-1 min-w-0 bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-4 md:px-5 py-3 md:py-3.5 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg transition" placeholder="Paste link or type note here...">
                         <button id="quickSendBtn" class="shrink-0 bg-primary hover:bg-blue-700 text-white px-4 md:px-8 py-3 md:py-3.5 rounded-xl font-semibold transition shadow-sm flex items-center gap-2">
                             <span class="hidden md:inline">Send</span>
@@ -227,9 +239,13 @@
                     <button id="addBtn" class="shrink-0 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i> Add New
                     </button>
+                    <button id="newDirEditBtn" onclick="newDir()" class="shrink-0 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2"><i data-lucide="folder-plus" class="w-4 h-4"></i> New Folder</button>
                     <button id="copyBtn" class="shrink-0 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2">
                         <i data-lucide="copy" class="w-4 h-4"></i> Copy All
                     </button>
+                    <button id="exportBtn" class="shrink-0 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Export</button>
+                    <button id="importBtn" class="shrink-0 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2"><i data-lucide="upload" class="w-4 h-4"></i> Import</button>
+                    <input type="file" id="importInput" accept=".json,application/json" class="hidden">
                     <button id="clearBtn" class="shrink-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-900/40 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition flex items-center gap-2 ml-auto">
                         <i data-lucide="trash-2" class="w-4 h-4"></i> Clear All
                     </button>
@@ -317,6 +333,19 @@
         </div>
     </div>
 
+    <!-- 4. Folder name / Move dialog -->
+    <div id="dlg" class="hidden-mode pop-animation fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex justify-center items-center p-4">
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl shadow-2xl w-full max-w-sm max-h-[85dvh] flex flex-col">
+            <h2 id="dlgTitle" class="text-xl font-bold mb-4 text-gray-900 dark:text-white"></h2>
+            <input id="dlgInput" maxlength="40" autocomplete="off" placeholder="Folder name" class="w-full bg-gray-50 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-base md:text-lg text-gray-900 dark:text-gray-100">
+            <div id="dlgList" class="flex flex-col gap-1.5 overflow-y-auto mb-4 min-h-0"></div>
+            <div class="flex gap-3">
+                <button id="dlgCancel" class="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 py-3 rounded-xl font-semibold transition">Cancel</button>
+                <button id="dlgOk" class="flex-1 bg-primary hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition shadow-md">Save</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK & Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
@@ -362,6 +391,7 @@
         let isEditMode = false;
         let latestText = "";
         let activeEditIndex = null;
+        let curFolder = '', filt = 'all';
 
         // ================= TITLE HELPERS =================
         // Ek note ek line hota hai. Title ho to line "Title[::TITLE::]content" format me save hoti hai.
@@ -377,7 +407,8 @@
             return (str || "").split(TITLE_SEP).join(' ').replace(/[⟪⟫\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
         }
 
-        function parseLine(raw) {
+        function parseLine(raw0) {
+            const M = parseMeta(raw0), raw = M.rest;
             let name = "";
             let body = raw;
             if (raw.startsWith(NAME_OPEN) && raw.indexOf(NAME_CLOSE) > 0) {
@@ -389,12 +420,14 @@
                 name = raw.slice(0, i).trim();
                 body = raw.slice(i + TITLE_SEP.length);
             }
-            return { name, content: body.trim().replace(/ ↵ /g, '\n') };
+            return { name, content: body.trim().replace(/ ↵ /g, '\n'), folder: M.folder, pin: M.pin, ts: M.ts };
         }
 
         // encodedContent = already converted newlines to " ↵ "
-        function buildLine(name, encodedContent) {
-            return name ? `${name}${TITLE_SEP}${encodedContent}` : encodedContent;
+        function buildLine(name, encodedContent, meta) {
+            meta = meta || { folder: curFolder, pin: false, ts: Date.now() };
+            const body = name ? `${name}${TITLE_SEP}${encodedContent}` : encodedContent;
+            return `[::M:${meta.folder}|${meta.pin ? 1 : 0}|${meta.ts}::]${body}`;
         }
 
         function getLines(text = latestText) {
@@ -583,7 +616,7 @@
                 const lines = getLines();
                 if(lines[index]) {
                     const { content } = parseLine(lines[index]);
-                    navigator.clipboard.writeText(content);
+                    navigator.clipboard.writeText(content).then(() => toast('Copied'));
                 }
             } catch(e) { console.error(e); }
         }
@@ -643,6 +676,7 @@
         }
 
         function noMatchHTML() {
+            if (!searchTerms.length) return `<div class="flex flex-col items-center justify-center opacity-40 mt-10 text-center px-6"><i data-lucide="folder-open" class="w-16 h-16 mb-4"></i><p class="text-xl font-semibold">Nothing here yet</p><p class="mt-1 text-sm">Add a note or create a folder.</p></div>`;
             return `
                 <div class="flex flex-col items-center justify-center h-full opacity-40 mt-10 text-center px-6">
                     <i data-lucide="search" class="w-16 h-16 mb-4"></i>
@@ -653,7 +687,7 @@
 
         function updateSearchCount() {
             if (!searchTerms.length) { searchCount.classList.add('hidden'); return; }
-            const n = getLines().filter(line => titleMatches(parseLine(line).name)).length;
+            const n = order(getLines()).length;
             searchCount.textContent = `${n} found`;
             searchCount.classList.remove('hidden');
         }
@@ -685,8 +719,190 @@
             if (e.key === 'Enter') { e.preventDefault(); searchInput.blur(); }
         });
 
-        // ================= VIEW MODE RENDER =================
+        // ===== FOLDERS + PIN + FILTER + TOAST + EXPORT (added) =====
+const $ = id => document.getElementById(id);
+const crumbs = $('crumbs'), chips = $('chips');
+const dlg = $('dlg'), dlgTitle = $('dlgTitle'), dlgInput = $('dlgInput'), dlgList = $('dlgList'), dlgOkBtn = $('dlgOk');
+let dlgCb = null;
+const isDir = l => l.startsWith('[::DIR::]');
+function parseDir(l) { const r = l.slice(9), i = r.indexOf('|'), j = r.indexOf('|', i + 1); return { id: r.slice(0, i), parent: r.slice(i + 1, j), name: r.slice(j + 1) }; }
+function parseMeta(raw) {
+    const m = raw.match(/^\[::M:([^|\]:]*)\|([01])\|(\d*)::\]/);
+    return m ? { folder: m[1], pin: m[2] === '1', ts: +m[3] || 0, rest: raw.slice(m[0].length) } : { folder: '', pin: false, ts: 0, rest: raw };
+}
+function setMeta(raw, patch) { const m = parseMeta(raw), x = Object.assign({ folder: m.folder, pin: m.pin, ts: m.ts }, patch); return `[::M:${x.folder}|${x.pin ? 1 : 0}|${x.ts}::]${m.rest}`; }
+const save = ls => updateFirebaseText(ls.join('\n'));
+const rid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+
+function toast(msg) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.className = 'fixed left-1/2 -translate-x-1/2 bottom-28 z-[70] max-w-[90vw] bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2.5 rounded-full text-sm font-semibold shadow-lg transition-opacity duration-300';
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = 0; }, 1600);
+    setTimeout(() => t.remove(), 2000);
+}
+function ago(t) {
+    const m = (Date.now() - t) / 6e4;
+    if (m < 1) return 'just now';
+    if (m < 60) return (m | 0) + 'm ago';
+    if (m < 1440) return ((m / 60) | 0) + 'h ago';
+    if (m < 43200) return ((m / 1440) | 0) + 'd ago';
+    return new Date(t).toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function pathOf(id) {
+    const ds = getLines().filter(isDir).map(parseDir), p = [];
+    while (id) { const d = ds.find(x => x.id === id); if (!d || p.length > 20) break; p.unshift(d); id = d.parent; }
+    return p;
+}
+const countIn = id => getLines().filter(l => isDir(l) ? parseDir(l).parent === id : parseMeta(l).folder === id).length;
+
+// which lines to show (current folder + filter chip + title search), folders first, then pinned
+function order(lines) {
+    const out = [], S = searchTerms.length;
+    lines.forEach((l, i) => {
+        if (isDir(l)) { const d = parseDir(l); if (S ? titleMatches(d.name) : (d.parent === curFolder && filt === 'all')) out.push(i); return; }
+        const p = parseLine(l), u = !!p.content.match(URL_REGEX);
+        if (S ? !titleMatches(p.name) : p.folder !== curFolder) return;
+        if ((filt === 'link' && !u) || (filt === 'text' && u) || (filt === 'pin' && !p.pin)) return;
+        out.push(i);
+    });
+    const r = i => isDir(lines[i]) ? 0 : (parseLine(lines[i]).pin ? 1 : 2);
+    return out.sort((a, b) => r(a) - r(b) || a - b);
+}
+
+function dirCard(i) {
+    const d = parseDir(getLines()[i]), n = countIn(d.id);
+    const b = (fn, ic, t, c) => `<button onclick="event.stopPropagation(); ${fn}('${d.id}')" class="p-2 ${c} rounded-lg transition" title="${t}"><i data-lucide="${ic}" class="w-5 h-5"></i></button>`;
+    const tail = rendering === 'edit'
+        ? b('renameDir', 'pencil', 'Rename', 'text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30') + b('deleteDir', 'trash-2', 'Delete folder', 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30')
+        : '<i data-lucide="chevron-right" class="w-6 h-6 text-gray-400 group-hover:text-primary shrink-0"></i>';
+    return `<div onclick="openDir('${d.id}')" class="named-accent group w-full shrink-0 h-24 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 px-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center gap-4 shadow-sm hover:shadow-md transition cursor-pointer">
+        <i data-lucide="folder" class="w-9 h-9 shrink-0 text-amber-500"></i>
+        <div class="flex-1 min-w-0"><div class="font-bold text-lg md:text-xl truncate">${highlightTitle(d.name)}</div><div class="text-sm text-gray-500 dark:text-gray-400">${n} item${n === 1 ? '' : 's'}</div></div>${tail}</div>`;
+}
+function badge(raw) {
+    const p = parseLine(raw);
+    return `<span class="absolute bottom-1 right-3 text-[11px] text-gray-400 flex items-center gap-1 pointer-events-none">${p.pin ? '<i data-lucide="pin" class="w-3 h-3 text-amber-500"></i>' : ''}${p.ts ? ago(p.ts) : ''}</span>`;
+}
+const pinBtn = i => `<button onclick="event.stopPropagation(); togglePin(${i})" class="p-1.5 md:p-2 ${parseLine(getLines()[i]).pin ? 'text-amber-500' : 'text-gray-400 hover:text-amber-500'} hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition" title="Pin / Unpin"><i data-lucide="pin" class="w-5 h-5"></i></button>`;
+const moveBtn = i => `<button onclick="event.stopPropagation(); moveNote(${i})" class="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Move to folder"><i data-lucide="folder-input" class="w-5 h-5"></i></button>`;
+
+/* V2-FILTER-MENU */
+const FILTERS = [['all', 'All', 'layers'], ['link', 'Links', 'link'], ['text', 'Text', 'align-left'], ['pin', 'Pinned', 'pin']];
+function drawNav() {
+    const p = pathOf(curFolder);
+    const cls = on => 'flex items-center gap-1 px-2 py-1 rounded-lg shrink-0 ' + (on ? 'text-primary bg-blue-50 dark:bg-blue-900/30' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800');
+    let h = `<button onclick="openDir('')" class="${cls(!p.length)}"><i data-lucide="house" class="w-4 h-4"></i>Home</button>`;
+    p.forEach((d, i) => { h += `<i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 shrink-0"></i><button onclick="openDir('${d.id}')" class="${cls(i === p.length - 1)}">${escapeHTML(d.name)}</button>`; });
+    crumbs.innerHTML = h;
+    $('filterMenu').innerHTML = FILTERS.map(([k, t, ic]) =>
+        `<button onclick="setFilt('${k}')" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-semibold text-left transition ${filt === k ? 'bg-blue-50 dark:bg-blue-900/30 text-primary' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}"><i data-lucide="${ic}" class="w-4 h-4"></i><span class="flex-1">${t}</span>${filt === k ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}</button>`).join('');
+    $('filterDot').classList.toggle('hidden', filt === 'all');
+    syncNav();
+    lucide.createIcons();
+}
+function refresh() { activeEditIndex = null; renderViewModeText(latestText); renderEditModeText(); updateSearchCount(); }
+window.openDir = id => { curFolder = id; filt = 'all'; searchInput.value = ''; searchTerms = []; refresh(); };
+window.setFilt = k => { filt = k; refresh(); };
+
+// ---- small dialog (input or pick-list) ----
+function openDlg(title, o) {
+    dlgTitle.textContent = title;
+    dlgInput.classList.toggle('hidden', o.val == null);
+    dlgInput.value = o.val || '';
+    dlgList.innerHTML = '';
+    dlgOkBtn.classList.toggle('hidden', !!o.list);
+    dlgCb = o.ok || null;
+    (o.list || []).forEach(([label, fn]) => {
+        const b = document.createElement('button');
+        b.className = 'text-left px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-gray-800 dark:text-gray-200 font-medium truncate shrink-0';
+        b.textContent = label;
+        b.onclick = () => { closeDlg(); fn(); };
+        dlgList.appendChild(b);
+    });
+    dlg.classList.remove('hidden-mode'); dlg.classList.add('modal-active');
+    if (o.val != null) setTimeout(() => dlgInput.focus(), 100);
+}
+function closeDlg() { dlg.classList.remove('modal-active'); dlg.classList.add('hidden-mode'); }
+dlgOkBtn.onclick = () => { const v = sanitizeName(dlgInput.value); if (!v || !dlgCb) return; const cb = dlgCb; closeDlg(); cb(v); };
+$('dlgCancel').onclick = closeDlg;
+dlg.addEventListener('click', e => { if (e.target === dlg) closeDlg(); });
+dlgInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); dlgOkBtn.click(); } });
+
+// ---- folder actions ----
+window.newDir = () => openDlg('New folder', { val: '', ok: async n => { if (await save([`[::DIR::]${rid()}|${curFolder}|${n}`, ...getLines()])) toast('Folder created'); } });
+window.renameDir = id => {
+    const ls = getLines(), i = ls.findIndex(l => isDir(l) && parseDir(l).id === id); if (i < 0) return;
+    const d = parseDir(ls[i]);
+    openDlg('Rename folder', { val: d.name, ok: async n => { ls[i] = `[::DIR::]${d.id}|${d.parent}|${n}`; if (await save(ls)) toast('Renamed'); } });
+};
+window.deleteDir = id => {
+    const ds = getLines().filter(isDir).map(parseDir), me = ds.find(d => d.id === id); if (!me) return;
+    const ids = new Set([id]); let n;
+    do { n = ids.size; ds.forEach(d => { if (ids.has(d.parent)) ids.add(d.id); }); } while (ids.size !== n);
+    showCustomConfirm('Delete folder?', `"${me.name}" and everything inside it will be deleted from all devices.`, async () => {
+        await save(getLines().filter(l => isDir(l) ? !ids.has(parseDir(l).id) : !ids.has(parseMeta(l).folder)));
+        if (ids.has(curFolder)) curFolder = '';
+    });
+};
+window.moveNote = i => {
+    const ds = getLines().filter(isDir).map(parseDir);
+    const opts = [['🏠 Home', '']].concat(ds.map(d => ['📁 ' + pathOf(d.id).map(x => x.name).join(' / '), d.id]));
+    openDlg('Move to…', { list: opts.map(([t, id]) => [t, async () => { const ls = getLines(); ls[i] = setMeta(ls[i], { folder: id }); if (await save(ls)) toast('Moved'); }]) });
+};
+window.togglePin = async i => {
+    const ls = getLines(), was = parseMeta(ls[i]).pin;
+    ls[i] = setMeta(ls[i], { pin: !was });
+    if (await save(ls)) toast(was ? 'Unpinned' : 'Pinned to top');
+};
+
+// V3-NO-PASTE
+// ---- export / import backup ----
+$('exportBtn').onclick = () => {
+    if (!latestText.trim()) return toast('Nothing to export');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'sharelink', text: latestText })], { type: 'application/json' }));
+    a.download = 'sharelink-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.click(); toast('Backup downloaded');
+};
+$('importBtn').onclick = () => $('importInput').click();
+$('importInput').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+        const j = JSON.parse(await f.text()), have = new Set(getLines()), add = getLines(j.text || '').filter(l => !have.has(l));
+        if (!add.length) toast('Nothing new to import');
+        else if (await save([...add, ...getLines()])) toast(add.length + ' item(s) imported');
+    } catch (err) { toast('Invalid backup file'); }
+    e.target.value = '';
+};
+drawNav();
+$('filterBtn').onclick = e => { e.stopPropagation(); $('filterMenu').classList.toggle('hidden'); };
+document.addEventListener('click', () => $('filterMenu').classList.add('hidden'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('filterMenu').classList.add('hidden'); });
+const _setFilt = window.setFilt;
+window.setFilt = k => { _setFilt(k); $('filterMenu').classList.add('hidden'); };
+const syncEdit = () => {}; /* V5-EDIT-NEWFOLDER */
+toggleBtn.addEventListener('click', syncEdit); syncEdit();
+/* V4-NAV-TOGGLE */
+var navOpen = false;
+function syncNav() {
+    $('navBar').classList.toggle('hidden-mode', !navOpen);
+    $('navDot').classList.toggle('hidden', navOpen || (!curFolder && filt === 'all'));
+}
+$('logoBtn').addEventListener('click', () => { navOpen = !navOpen; syncNav(); });
+const _openDir = window.openDir;
+window.openDir = id => { if (id) navOpen = true; _openDir(id); };
+syncNav();
+var rendering = 'view'; /* V6-VIEW-NO-EDIT-ICONS */
+// ===== END ADDED BLOCK =====
+
+// ================= VIEW MODE RENDER =================
         function renderViewModeText(text) {
+            rendering = 'view';
+            if (curFolder && !pathOf(curFolder).length) curFolder = '';
+            drawNav();
             if (!text || text.trim() === "") {
                 notesContainer.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-full opacity-40 mt-10">
@@ -701,7 +917,9 @@
             const lines = getLines(text);
             
             let htmlContent = "";
-            lines.forEach((rawLine, index) => {
+            order(lines).forEach(index => {
+                const rawLine = lines[index];
+                if (isDir(rawLine)) { htmlContent += dirCard(index); return; }
                 const { name, content } = parseLine(rawLine);
                 if (searchTerms.length && !titleMatches(name)) return; // search: sirf title se
 
@@ -712,14 +930,14 @@
                     const clickAttr = firstUrl ? `onclick="window.openSafeUrl(${index}, event)"` : '';
 
                     htmlContent += `
-                        <div ${clickAttr} class="named-card named-accent note-box group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 rounded-xl text-gray-800 dark:text-gray-200 shadow-sm transition hover:shadow-md ${firstUrl ? 'cursor-pointer' : ''} flex flex-col overflow-hidden relative">
+                        <div ${clickAttr} class="named-card named-accent note-box group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 rounded-xl text-gray-800 dark:text-gray-200 shadow-sm transition hover:shadow-md ${firstUrl ? 'cursor-pointer' : ''} flex flex-col overflow-hidden relative">${badge(rawLine)}
                             <div class="flex items-center gap-2.5 px-3.5 md:px-4 ${hasBody ? 'pt-3 pb-2.5 shrink-0' : 'flex-1'}">
                                 <i data-lucide="tag" class="w-5 h-5 shrink-0 text-amber-500"></i>
                                 <span class="flex-1 min-w-0 font-bold text-gray-900 dark:text-white text-lg md:text-xl leading-snug truncate">${highlightTitle(name)}</span>
                                 ${hasBody ? `
                                 <div class="flex items-center gap-1 shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                                     ${firstUrl ? `<div class="text-primary p-1.5"><i data-lucide="external-link" class="w-5 h-5"></i></div>` : ''}
-                                    <button onclick="event.stopPropagation(); window.copySingleNote(${index})" class="p-1.5 text-gray-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Copy">
+                                    ${pinBtn(index)}<button onclick="event.stopPropagation(); window.copySingleNote(${index})" class="p-1.5 text-gray-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Copy">
                                         <i data-lucide="copy" class="w-5 h-5"></i>
                                     </button>
                                 </div>` : ''}
@@ -743,7 +961,7 @@
                 
                 // UI FIX: Added shrink-0 to prevent box from getting smaller when list overflows
                 htmlContent += `
-                    <div ${clickAttr} class="note-box group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden relative">
+                    <div ${clickAttr} class="note-box group w-full shrink-0 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary/50 p-3.5 md:p-4 rounded-xl text-gray-800 dark:text-gray-200 flex items-center gap-3 md:gap-4 shadow-sm transition hover:shadow-md cursor-pointer overflow-hidden relative">${badge(rawLine)}
                         <div class="text-gray-400 group-hover:text-primary transition-colors shrink-0 flex items-center justify-center">
                             <i data-lucide="${iconName}" class="w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
@@ -752,7 +970,7 @@
                         </div>
                         <div class="flex items-center gap-1 shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                             ${firstUrl ? `<div class="text-primary p-2"><i data-lucide="external-link" class="w-5 h-5"></i></div>` : ''}
-                            <button onclick="event.stopPropagation(); window.copySingleNote(${index})" class="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Copy">
+                            ${pinBtn(index)}<button onclick="event.stopPropagation(); window.copySingleNote(${index})" class="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Copy">
                                 <i data-lucide="copy" class="w-5 h-5"></i>
                             </button>
                         </div>
@@ -769,6 +987,7 @@
 
         // ================= EDIT MODE RENDER =================
         window.renderEditModeText = function() {
+            rendering = 'edit';
             if (activeEditIndex !== null) return; 
             
             const lines = getLines();
@@ -779,7 +998,9 @@
             }
 
             let htmlContent = "";
-            lines.forEach((rawLine, index) => {
+            order(lines).forEach(index => {
+                const rawLine = lines[index];
+                if (isDir(rawLine)) { htmlContent += dirCard(index); return; }
                 const { name, content } = parseLine(rawLine);
                 if (searchTerms.length && !titleMatches(name)) return; // search: sirf title se
                 const safeLine = escapeHTML(content);
@@ -797,10 +1018,10 @@
                             <div class="whitespace-pre-wrap break-words leading-relaxed ${hasName ? 'text-sm md:text-base text-gray-500 dark:text-gray-400 line-clamp-2' : 'text-base md:text-lg line-clamp-3'}">${safeLine}</div>
                         </div>
                         <div class="flex items-center gap-1 shrink-0 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="event.stopPropagation(); window.deleteLine(${index})" class="p-2 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition" title="Delete Note">
+                            ${pinBtn(index)}${moveBtn(index)}<button onclick="event.stopPropagation(); window.deleteLine(${index})" class="p-2 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition" title="Delete Note">
                                 <i data-lucide="trash-2" class="w-5 h-5"></i>
                             </button>
-                            <button class="p-2 text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Edit Note">
+                            <button class="hidden sm:block p-2 text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="Edit Note">
                                 <i data-lucide="pencil" class="w-5 h-5"></i>
                             </button>
                         </div>
@@ -867,7 +1088,7 @@
             let lines = getLines();
             
             if (newVal === "") { lines.splice(index, 1); }
-            else { lines[index] = buildLine(newName, newVal); }
+            else { lines[index] = buildLine(newName, newVal, parseMeta(lines[index])); }
             
             const success = await updateFirebaseText(lines.join('\n'));
             if (success) {
@@ -976,7 +1197,7 @@
 
         // Copy All / Download: titled notes "Title: link" format me copy hote hain
         function getPlainTextAll() {
-            return getLines().map(lineToPlainText).join('\n');
+            return getLines().filter(l => !isDir(l) && parseLine(l).folder === curFolder).map(lineToPlainText).join('\n');
         }
 
         copyBtn.addEventListener('click', async () => {
