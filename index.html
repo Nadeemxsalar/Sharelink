@@ -204,7 +204,7 @@
             </div>
 
             <!-- Quick Add Bar -->
-            <div class="w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-3 md:p-4 shrink-0 flex justify-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 transition-colors pb-safe">
+            <div id="quickBar" class="hidden-mode w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-3 md:p-4 shrink-0 flex justify-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 transition-colors pb-safe">
                 <div class="w-full max-w-4xl flex flex-col">
                     <!-- Title field (slides open when the tag button is on) -->
                     <div id="quickNameCollapse" class="name-collapse w-full">
@@ -889,9 +889,11 @@ toggleBtn.addEventListener('click', syncEdit); syncEdit();
 var navOpen = false;
 function syncNav() {
     $('navBar').classList.toggle('hidden-mode', !navOpen);
+    $('quickBar').classList.toggle('hidden-mode', !quickOpen);
     $('navDot').classList.toggle('hidden', navOpen || (!curFolder && filt === 'all'));
 }
-$('logoBtn').addEventListener('click', () => { navOpen = !navOpen; syncNav(); });
+var quickOpen = false; /* V7-QUICKBAR-TOGGLE */
+$('logoBtn').addEventListener('click', () => { const on = !(navOpen && quickOpen); navOpen = quickOpen = on; syncNav(); });
 const _openDir = window.openDir;
 window.openDir = id => { if (id) navOpen = true; _openDir(id); };
 syncNav();
@@ -908,7 +910,7 @@ var rendering = 'view'; /* V6-VIEW-NO-EDIT-ICONS */
                     <div class="flex flex-col items-center justify-center h-full opacity-40 mt-10">
                         <i data-lucide="inbox" class="w-16 h-16 mb-4"></i>
                         <p class="text-xl font-semibold">Ready to receive links</p>
-                        <p class="mt-1 text-sm">Paste a link below and hit send.</p>
+                        <p class="mt-1 text-sm">Tap ShareLink at the top to add a link.</p>
                     </div>`;
                 lucide.createIcons();
                 return;
