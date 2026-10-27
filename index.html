@@ -892,12 +892,33 @@ function syncNav() {
     $('quickBar').classList.toggle('hidden-mode', !quickOpen);
     $('navDot').classList.toggle('hidden', navOpen || (!curFolder && filt === 'all'));
 }
-var quickOpen = false; /* V7-QUICKBAR-TOGGLE */
-$('logoBtn').addEventListener('click', () => { const on = !(navOpen && quickOpen); navOpen = quickOpen = on; syncNav(); });
+var quickOpen = false; /* V7-QUICKBAR-TOGGLE */ /* V8-STATUS-TOGGLE */
+/* V9-LOGO-CYCLE */
+$('logoBtn').addEventListener('click', () => { if (!navOpen && !quickOpen) navOpen = true; else if (navOpen && !quickOpen) { navOpen = false; quickOpen = true; } else { navOpen = quickOpen = false; } syncNav(); });
 const _openDir = window.openDir;
 window.openDir = id => { if (id) navOpen = true; _openDir(id); };
 syncNav();
 var rendering = 'view'; /* V6-VIEW-NO-EDIT-ICONS */
+/* V10-WHEEL-SCROLL */
+const listEl = () => isEditMode ? editNotesContainer : notesContainer;
+const modalOpen = () => document.querySelector('.modal-active');
+document.addEventListener('wheel', e => {
+    const c = listEl();
+    if (e.ctrlKey || modalOpen() || c.contains(e.target) || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    c.scrollTop += e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? c.clientHeight : 1);
+    e.preventDefault();
+}, { passive: false });
+document.addEventListener('keydown', e => {
+    const t = e.target;
+    if (e.ctrlKey || e.altKey || e.metaKey || modalOpen() || t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+    const c = listEl(), k = e.key;
+    const step = k === 'ArrowDown' ? 80 : k === 'ArrowUp' ? -80 : k === 'PageDown' ? c.clientHeight * 0.9 : k === 'PageUp' ? -c.clientHeight * 0.9 : 0;
+    if (step) c.scrollBy({ top: step, behavior: 'smooth' });
+    else if (k === 'Home') c.scrollTo({ top: 0, behavior: 'smooth' });
+    else if (k === 'End') c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
+    else return;
+    e.preventDefault();
+});
 // ===== END ADDED BLOCK =====
 
 // ================= VIEW MODE RENDER =================
@@ -910,7 +931,7 @@ var rendering = 'view'; /* V6-VIEW-NO-EDIT-ICONS */
                     <div class="flex flex-col items-center justify-center h-full opacity-40 mt-10">
                         <i data-lucide="inbox" class="w-16 h-16 mb-4"></i>
                         <p class="text-xl font-semibold">Ready to receive links</p>
-                        <p class="mt-1 text-sm">Tap ShareLink at the top to add a link.</p>
+                        <p class="mt-1 text-sm">Tap ShareLink at the top (twice) to add a link.</p>
                     </div>`;
                 lucide.createIcons();
                 return;
